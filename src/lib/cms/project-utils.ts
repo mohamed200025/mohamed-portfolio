@@ -4,8 +4,13 @@ export function normalizeProject(
   row: Record<string, unknown>,
   images: ProjectImage[] = []
 ): ProjectRecord {
+  const websiteUrl = typeof row.website_url === "string" ? row.website_url.trim() : null;
+  const liveDemoUrl = typeof row.live_demo_url === "string" ? row.live_demo_url.trim() : null;
+
   return {
     ...(row as unknown as ProjectRecord),
+    website_url: websiteUrl || null,
+    live_demo_url: liveDemoUrl || null,
     features: (row.features as string[]) ?? [],
     technologies: (row.technologies as string[]) ?? [],
     statistics: (row.statistics as ProjectStatistic[]) ?? [],
@@ -17,8 +22,17 @@ export function normalizeProject(
   };
 }
 
+export function getWebsiteUrl(project: Pick<ProjectRecord, "website_url">): string {
+  const url = project.website_url?.trim();
+  return url ?? "";
+}
+
 export function hasUrl(url?: string | null): boolean {
   return Boolean(url?.trim());
+}
+
+export function shouldShowWebsiteButton(project: Pick<ProjectRecord, "website_url">): boolean {
+  return hasUrl(getWebsiteUrl(project));
 }
 
 export function isExternalUrl(url: string): boolean {

@@ -69,13 +69,13 @@ export function ProjectScreenshotShowcase({
         <div className="relative">
           <div className="overflow-hidden rounded-t-lg border border-white/10 bg-gradient-to-b from-zinc-700 to-zinc-800 p-[2px] shadow-2xl shadow-black/50">
             <div className="absolute left-1/2 top-1 z-10 h-0.5 w-0.5 -translate-x-1/2 rounded-full bg-zinc-600" />
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-t-[8px] bg-black">
+            <div className="relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-t-[8px] bg-[#0a0a0f]">
               <Image
                 src={desktopUrl}
                 alt={`${alt} desktop screenshot`}
                 fill
                 priority={priority}
-                className="object-cover object-top"
+                className="object-contain object-center"
                 sizes={size === "large" ? "(max-width: 1024px) 90vw, 720px" : "(max-width: 768px) 100vw, 520px"}
               />
             </div>
@@ -101,12 +101,12 @@ export function ProjectScreenshotShowcase({
             className={`relative ${phoneWidth} overflow-hidden rounded-[18px] border-[2.5px] border-zinc-700 bg-zinc-800 shadow-2xl shadow-black/60`}
           >
             <div className="absolute left-1/2 top-1 z-10 h-2.5 w-10 -translate-x-1/2 rounded-full bg-zinc-900" />
-            <div className="relative aspect-[9/19] w-full overflow-hidden rounded-[15px] bg-black">
+            <div className="relative flex aspect-[9/19] w-full items-center justify-center overflow-hidden rounded-[15px] bg-[#0a0a0f]">
               <Image
                 src={mobileUrl}
                 alt={`${alt} mobile screenshot`}
                 fill
-                className="object-cover object-top"
+                className="object-contain object-center"
                 sizes="130px"
               />
             </div>

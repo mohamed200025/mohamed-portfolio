@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import type { ProjectPageData } from "@/lib/cms/projects";
-import { hasUrl, isExternalUrl } from "@/lib/cms/project-utils";
+import { getWebsiteUrl, hasUrl, isExternalUrl } from "@/lib/cms/project-utils";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { ProjectShowcase } from "@/components/projects/ProjectShowcase";
 import { ProjectPageNav } from "./ProjectPageNav";
@@ -60,7 +60,7 @@ export function ProjectDetailsPage({
     return [...new Set([...fromImages, ...fromCms])].filter(Boolean);
   }, [project.images, project.gallery_images]);
 
-  const websiteUrl = project.website_url?.trim() ?? "";
+  const websiteUrl = getWebsiteUrl(project);
   const liveDemoUrl = project.live_demo_url?.trim() ?? "";
   const stats = project.statistics ?? [];
   const results = project.results ?? [];

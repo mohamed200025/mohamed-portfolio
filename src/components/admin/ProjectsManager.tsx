@@ -7,6 +7,7 @@ import type { ProjectImage, ProjectRecord } from "@/types/cms";
 import {
   formatResultsInput,
   formatStatisticsInput,
+  normalizeProject,
   parseLinesInput,
   parseResultsInput,
   parseStatisticsInput,
@@ -69,18 +70,7 @@ export function ProjectsManager() {
   const loadProjects = async () => {
     const supabase = createClient();
     const { data } = await supabase.from("projects").select("*").order("sort_order");
-    setProjects(
-      (data ?? []).map((row) => ({
-        ...(row as ProjectRecord),
-        features: (row.features as string[]) ?? [],
-        technologies: (row.technologies as string[]) ?? [],
-        statistics: (row.statistics as ProjectRecord["statistics"]) ?? [],
-        results: (row.results as ProjectRecord["results"]) ?? [],
-        challenges: (row.challenges as string[]) ?? [],
-        solutions: (row.solutions as string[]) ?? [],
-        gallery_images: (row.gallery_images as string[]) ?? [],
-      }))
-    );
+    setProjects((data ?? []).map((row) => normalizeProject(row as Record<string, unknown>)));
     setLoading(false);
   };
 
