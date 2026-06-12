@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Send } from "lucide-react";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { fadeIn } from "@/lib/animations";
 
 const navLinks = [
@@ -11,16 +12,11 @@ const navLinks = [
   { label: "Projects", href: "#projects" },
   { label: "Services", href: "#services" },
   { label: "Technologies", href: "#technologies" },
+  { label: "Calculator", href: "#calculator" },
   { label: "Contact", href: "#contact" },
 ];
 
-export function Navbar({
-  name = "Mohamed Ournani",
-  title = "Full Stack & Flutter Developer",
-}: {
-  name?: string;
-  title?: string;
-}) {
+export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -30,19 +26,9 @@ export function Navbar({
       initial="hidden"
       animate="visible"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
-        {/* Logo */}
-        <a href="#home" className="group flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-violet-600 shadow-lg shadow-blue-500/20 transition-shadow group-hover:shadow-blue-500/40">
-            <span className="text-sm font-bold text-white">MO</span>
-          </div>
-          <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-white">{name}</p>
-            <p className="text-xs text-white/50">{title}</p>
-          </div>
-        </a>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 lg:px-8 lg:py-3.5">
+        <BrandLogo href="#home" />
 
-        {/* Desktop nav */}
         <nav className="hidden items-center gap-8 lg:flex">
           {navLinks.map((link) => (
             <a
@@ -63,7 +49,6 @@ export function Navbar({
           ))}
         </nav>
 
-        {/* CTA */}
         <div className="flex items-center gap-3">
           <motion.a
             href="#contact"
@@ -85,7 +70,6 @@ export function Navbar({
         </div>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div

@@ -1,5 +1,7 @@
-import type { AboutSettings, HeroSettings, JourneyEntry, PortfolioData, SeoSettings } from "@/types/cms";
+import type { AboutSettings, ContactSettings, HeroSettings, JourneyEntry, PortfolioData, PricingCurrency, PricingData, PricingFeature, PricingProjectType, PricingSettings, PricingTimelineOption, SeoSettings } from "@/types/cms";
+import { buildPricingData } from "@/lib/cms/pricing-utils";
 import { aboutSettingsToStatistics } from "@/lib/cms/about-utils";
+import { contactSettingsToMethods } from "@/lib/cms/contact-utils";
 import { projects as staticProjects, projectStats } from "@/lib/projects-data";
 import { journey, services as aboutServices } from "@/lib/about-data";
 import { services as serviceCards, benefits } from "@/lib/services-data";
@@ -31,6 +33,7 @@ export const defaultHero: HeroSettings = {
   ],
   profile_name: "Mohamed Ournani",
   profile_title: "Full Stack & Flutter Developer",
+  featured_project_id: null,
 };
 
 export const defaultSeo: SeoSettings = {
@@ -274,26 +277,89 @@ export const defaultProjects = staticProjects.map((p, i) => ({
   solutions: (caseStudyDefaults[p.id]?.solutions as string[]) ?? [],
 }));
 
-export const defaultContactMethods = staticContactMethods.map((m, i) => ({
-  id: m.id,
-  type: m.id,
-  label: m.label,
-  value: m.value,
-  subtext: m.sub,
-  href: m.href,
-  sort_order: i,
-  published: true,
-}));
+export const defaultContactSettings: ContactSettings = {
+  id: 1,
+  whatsapp: staticContactMethods[0].value,
+  email: staticContactMethods[1].value,
+  linkedin_url: staticContactMethods[2].href,
+  linkedin_username: staticContactMethods[2].value,
+  github_url: staticContactMethods[3].href,
+  github_username: staticContactMethods[3].value,
+  contact_title: "Let's Work Together",
+  contact_subtitle:
+    "Have a project in mind or want to discuss an idea? I'm always open to new opportunities and exciting collaborations.",
+  calendly_url: "",
+};
+
+export const defaultContactMethods = contactSettingsToMethods(defaultContactSettings);
+
+const defaultPricingSettings: PricingSettings = {
+  id: 1,
+  badge: "PROJECT CALCULATOR",
+  title_prefix: "Calculate Your",
+  title_highlight: "Project Cost",
+  subtitle:
+    "Get an instant estimate for your project. Customize your requirements and receive a price range in real-time.",
+  default_currency: "EUR",
+  trust_items: [
+    { title: "Transparent Pricing", description: "No hidden costs" },
+    { title: "Quality Guaranteed", description: "High-quality code" },
+    { title: "On-Time Delivery", description: "Respecting deadlines" },
+    { title: "Support Included", description: "30 days of free support" },
+  ],
+};
+
+const defaultPricingCurrencies: PricingCurrency[] = [
+  { id: "cur-eur", code: "EUR", symbol: "€", exchange_rate: 1, enabled: true, sort_order: 0 },
+  { id: "cur-usd", code: "USD", symbol: "$", exchange_rate: 1.12, enabled: true, sort_order: 1 },
+  { id: "cur-dzd", code: "DZD", symbol: "DA", exchange_rate: 250, enabled: true, sort_order: 2 },
+];
+
+const defaultPricingProjectTypes: PricingProjectType[] = [
+  { id: "pt-1", title: "Landing Page", description: "Single page website", min_price: 300, max_price: 600, icon: "Monitor", sort_order: 0, published: true },
+  { id: "pt-2", title: "Business Website", description: "Multi-page business website", min_price: 600, max_price: 1200, icon: "Globe", sort_order: 1, published: true },
+  { id: "pt-3", title: "LMS Platform", description: "Learning management platform", min_price: 1500, max_price: 5000, icon: "Layers", sort_order: 2, published: true },
+  { id: "pt-4", title: "Mobile App", description: "iOS / Android application", min_price: 2500, max_price: 8000, icon: "Smartphone", sort_order: 3, published: true },
+];
+
+const defaultPricingFeatures: PricingFeature[] = [
+  { id: "pf-1", title: "Authentication", description: "User login and registration", min_price: 150, max_price: 300, icon: "User", sort_order: 0, published: true },
+  { id: "pf-2", title: "Admin Dashboard", description: "Back-office management panel", min_price: 200, max_price: 400, icon: "LayoutDashboard", sort_order: 1, published: true },
+  { id: "pf-3", title: "CMS", description: "Content management system", min_price: 150, max_price: 350, icon: "BookOpen", sort_order: 2, published: true },
+  { id: "pf-4", title: "Payment System", description: "Stripe or payment gateway", min_price: 200, max_price: 500, icon: "CreditCard", sort_order: 3, published: true },
+  { id: "pf-5", title: "Multi-language", description: "i18n support", min_price: 100, max_price: 250, icon: "Globe", sort_order: 4, published: true },
+  { id: "pf-6", title: "API Integration", description: "Third-party API connections", min_price: 150, max_price: 400, icon: "Code2", sort_order: 5, published: true },
+  { id: "pf-7", title: "AI Features", description: "AI-powered functionality", min_price: 300, max_price: 1000, icon: "Sparkles", sort_order: 6, published: true },
+  { id: "pf-8", title: "Push Notifications", description: "Mobile/web notifications", min_price: 100, max_price: 200, icon: "Bell", sort_order: 7, published: true },
+  { id: "pf-9", title: "SEO Optimization", description: "Search engine optimization", min_price: 100, max_price: 200, icon: "Search", sort_order: 8, published: true },
+];
+
+const defaultPricingTimelines: PricingTimelineOption[] = [
+  { id: "tl-1", title: "Urgent", percentage_modifier: 30, sort_order: 0, published: true },
+  { id: "tl-2", title: "Standard", percentage_modifier: 0, sort_order: 1, published: true },
+  { id: "tl-3", title: "Flexible", percentage_modifier: -10, sort_order: 2, published: true },
+];
+
+export const defaultPricingData: PricingData = buildPricingData(
+  defaultPricingSettings,
+  defaultPricingCurrencies,
+  defaultPricingProjectTypes,
+  defaultPricingFeatures,
+  defaultPricingTimelines
+);
 
 export const fallbackPortfolioData: PortfolioData = {
   hero: defaultHero,
+  featuredProject: defaultProjects[0] ?? null,
   about: defaultAbout,
   aboutStatistics: defaultAboutStatistics,
   journey: defaultJourney,
   projects: defaultProjects,
   projectStats: projectStats.map((s) => ({ label: s.label, icon: s.icon })),
   testimonials: [],
+  contactSettings: defaultContactSettings,
   contactMethods: defaultContactMethods,
+  pricingData: defaultPricingData,
   activeCv: null,
   seo: defaultSeo,
   sections: defaultSections,

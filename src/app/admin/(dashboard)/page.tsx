@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { fetchDashboardStats } from "@/lib/cms/fetch";
 import { StatCard } from "@/components/admin/StatCard";
 import { ViewsChart } from "@/components/admin/ViewsChart";
 import {
   BarChart3,
   Briefcase,
+  Calculator,
   Eye,
   Mail,
   Star,
@@ -21,7 +23,7 @@ export default async function AdminDashboardPage() {
         </p>
       </div>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <StatCard label="Total Projects" value={stats.totalProjects} icon={Briefcase} />
         <StatCard
           label="Unread Messages"
@@ -29,6 +31,15 @@ export default async function AdminDashboardPage() {
           icon={Mail}
           color="text-violet-400"
         />
+        <Link href="/admin/leads">
+          <StatCard
+            label="Quote Leads"
+            value={stats.unreadLeads}
+            icon={Calculator}
+            color="text-cyan-400"
+            trend={`${stats.totalLeads} total`}
+          />
+        </Link>
         <StatCard
           label="Testimonials"
           value={stats.testimonials}

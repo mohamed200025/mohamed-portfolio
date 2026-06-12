@@ -12,6 +12,7 @@ export interface HeroSettings {
   tech_stack: TechStackItem[];
   profile_name: string;
   profile_title: string;
+  featured_project_id: string | null;
 }
 
 export interface TechStackItem {
@@ -104,6 +105,19 @@ export interface ContactMethod {
   published: boolean;
 }
 
+export interface ContactSettings {
+  id: number;
+  whatsapp: string;
+  email: string;
+  linkedin_url: string;
+  linkedin_username: string;
+  github_url: string;
+  github_username: string;
+  contact_title: string;
+  contact_subtitle: string;
+  calendly_url: string;
+}
+
 export interface ContactMessage {
   id: string;
   name: string;
@@ -185,15 +199,108 @@ export interface SectionContent {
   content: Record<string, unknown>;
 }
 
+export interface PricingSettings {
+  id: number;
+  badge: string;
+  title_prefix: string;
+  title_highlight: string;
+  subtitle: string;
+  default_currency: string;
+  trust_items: { title: string; description: string }[];
+}
+
+export interface PricingCurrency {
+  id: string;
+  code: string;
+  symbol: string;
+  exchange_rate: number;
+  enabled: boolean;
+  sort_order: number;
+}
+
+export interface PricingProjectType {
+  id: string;
+  title: string;
+  description: string;
+  min_price: number;
+  max_price: number;
+  icon: string;
+  sort_order: number;
+  published: boolean;
+}
+
+export interface PricingFeature {
+  id: string;
+  title: string;
+  description: string;
+  min_price: number;
+  max_price: number;
+  icon: string;
+  sort_order: number;
+  published: boolean;
+}
+
+export interface PricingTimelineOption {
+  id: string;
+  title: string;
+  percentage_modifier: number;
+  sort_order: number;
+  published: boolean;
+}
+
+export interface PricingData {
+  settings: PricingSettings;
+  currencies: PricingCurrency[];
+  projectTypes: PricingProjectType[];
+  features: PricingFeature[];
+  timelineOptions: PricingTimelineOption[];
+}
+
+export interface PricingEstimate {
+  currency: PricingCurrency;
+  baseMin: number;
+  baseMax: number;
+  featureMin: number;
+  featureMax: number;
+  subtotalMin: number;
+  subtotalMax: number;
+  estimateMin: number;
+  estimateMax: number;
+  timelineMultiplier: number;
+  timeEstimate: string;
+  complexity: "low" | "medium" | "high";
+  complexityLabel: string;
+  projectTypeTitle: string;
+  timelineTitle: string;
+  selectedFeatures: { id: string; title: string; minPrice: number; maxPrice: number }[];
+}
+
+export interface PricingLead {
+  id: string;
+  name: string;
+  email: string;
+  whatsapp?: string | null;
+  project_type: string;
+  estimated_min: number;
+  estimated_max: number;
+  currency: string;
+  message?: string | null;
+  read: boolean;
+  created_at: string;
+}
+
 export interface PortfolioData {
   hero: HeroSettings;
+  featuredProject: ProjectRecord | null;
   about: AboutSettings;
   aboutStatistics: AboutStatistic[];
   journey: JourneyEntry[];
   projects: ProjectRecord[];
   projectStats: { label: string; icon: string }[];
   testimonials: Testimonial[];
+  contactSettings: ContactSettings;
   contactMethods: ContactMethod[];
+  pricingData: PricingData;
   activeCv: CvFile | null;
   seo: SeoSettings;
   sections: Record<string, Record<string, unknown>>;
@@ -205,6 +312,8 @@ export interface DashboardStats {
   publishedProjects: number;
   unreadMessages: number;
   totalMessages: number;
+  unreadLeads: number;
+  totalLeads: number;
   testimonials: number;
   pageViews30d: number;
   pageViewsToday: number;

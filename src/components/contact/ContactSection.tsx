@@ -10,8 +10,9 @@ import { ContactForm } from "./ContactForm";
 import { Footer } from "@/components/layout/Footer";
 import { contactMethods as staticContactMethods } from "@/lib/technologies-data";
 import { fadeUp, staggerContainer } from "@/lib/animations";
-import { defaultSections } from "@/lib/cms/defaults";
-import type { ContactMethod } from "@/types/cms";
+import { defaultContactSettings, defaultSections } from "@/lib/cms/defaults";
+import { contactSettingsToMethods, splitContactTitle } from "@/lib/cms/contact-utils";
+import type { ContactMethod, ContactSettings } from "@/types/cms";
 
 const iconMap = {
   whatsapp: { icon: MessageCircle, color: staticContactMethods[0].color },
@@ -21,12 +22,14 @@ const iconMap = {
 };
 
 interface ContactSectionProps {
+  contactSettings?: ContactSettings;
   contact?: Record<string, unknown>;
   contactMethods?: ContactMethod[];
   footer?: Record<string, unknown>;
 }
 
 export function ContactSection({
+  contactSettings = defaultContactSettings,
   contact = defaultSections.contact,
   contactMethods = [],
   footer = defaultSections.footer,
@@ -40,23 +43,15 @@ export function ContactSection({
   const backgroundY = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   const badge = (contact.badge as string) ?? "LET'S CONNECT";
-  const titlePrefix = (contact.title_prefix as string) ?? "Let's";
-  const titleHighlight = (contact.title_highlight as string) ?? "Work Together";
-  const subtitle = (contact.subtitle as string) ?? "";
+  const { prefix: titlePrefix, highlight: titleHighlight } = splitContactTitle(
+    contactSettings.contact_title || "Let's Work Together"
+  );
+  const subtitle = contactSettings.contact_subtitle || (contact.subtitle as string) || "";
 
   const methods =
     contactMethods.length > 0
       ? contactMethods
-      : staticContactMethods.map((m) => ({
-          id: m.id,
-          type: m.id,
-          label: m.label,
-          value: m.value,
-          subtext: m.sub,
-          href: m.href,
-          sort_order: 0,
-          published: true,
-        }));
+      : contactSettingsToMethods(contactSettings);
 
   return (
     <section
@@ -117,7 +112,7 @@ export function ContactSection({
               })}
             </motion.div>
 
-            <ContactCTA />
+            <ContactCTA calendlyUrl={contactSettings.calendly_url} />
           </motion.div>
 
           <ContactForm />

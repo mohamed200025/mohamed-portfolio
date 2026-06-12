@@ -1,0 +1,2 @@
+-- DEPRECATED: use 20250614_create_pricing_tables.sql instead.
+-- This file is kept for history only.

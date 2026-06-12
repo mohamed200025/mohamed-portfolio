@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { JourneyEntry } from "@/types/cms";
 import { JOURNEY_ICON_OPTIONS, JOURNEY_NODE_COLORS } from "@/lib/cms/about-utils";
 import { AdminFormField, adminInputClass, adminTextareaClass } from "./AdminFormField";
+import { AdminSelect } from "./AdminSelect";
 import { Plus, Save, Trash2 } from "lucide-react";
 
 const emptyEntry = (): Partial<JourneyEntry> => ({
@@ -116,22 +117,18 @@ export function JourneyManager() {
           <textarea className={adminTextareaClass} rows={4} value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </AdminFormField>
         <AdminFormField label="Icon">
-          <select className={adminInputClass} value={form.icon_name ?? "Building2"} onChange={(e) => setForm({ ...form, icon_name: e.target.value })}>
-            {JOURNEY_ICON_OPTIONS.map((icon) => (
-              <option key={icon} value={icon}>
-                {icon}
-              </option>
-            ))}
-          </select>
+          <AdminSelect
+            value={form.icon_name ?? "Building2"}
+            onChange={(icon_name) => setForm({ ...form, icon_name })}
+            options={JOURNEY_ICON_OPTIONS.map((icon) => ({ value: icon, label: icon }))}
+          />
         </AdminFormField>
         <AdminFormField label="Node Color">
-          <select className={adminInputClass} value={form.node_color ?? JOURNEY_NODE_COLORS[0].value} onChange={(e) => setForm({ ...form, node_color: e.target.value })}>
-            {JOURNEY_NODE_COLORS.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+          <AdminSelect
+            value={form.node_color ?? JOURNEY_NODE_COLORS[0].value}
+            onChange={(node_color) => setForm({ ...form, node_color })}
+            options={JOURNEY_NODE_COLORS.map((c) => ({ value: c.value, label: c.label }))}
+          />
         </AdminFormField>
         <label className="flex items-center gap-2 text-sm text-white/70">
           <input type="checkbox" checked={form.published ?? true} onChange={(e) => setForm({ ...form, published: e.target.checked })} />

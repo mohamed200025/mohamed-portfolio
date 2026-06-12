@@ -41,15 +41,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ProjectDetailsPage({
-  data,
-  heroName,
-  heroTitle,
-}: {
-  data: ProjectPageData;
-  heroName?: string;
-  heroTitle?: string;
-}) {
+export function ProjectDetailsPage({ data }: { data: ProjectPageData }) {
   const { project, prev, next } = data;
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [galleryPage, setGalleryPage] = useState(0);
@@ -87,7 +79,7 @@ export function ProjectDetailsPage({
 
   return (
     <div className="min-h-screen bg-[#050508] text-white">
-      <ProjectPageNav name={heroName} title={heroTitle} />
+      <ProjectPageNav />
 
       <main className="pt-24">
         {/* Hero */}

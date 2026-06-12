@@ -1,7 +1,6 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import type {
   DashboardStats,
-  HeroSettings,
   PortfolioData,
   ProjectRecord,
   SeoSettings,
@@ -10,6 +9,8 @@ import {
   defaultAbout,
   defaultAboutStatistics,
   defaultContactMethods,
+  defaultContactSettings,
+  defaultPricingData,
   defaultHero,
   defaultJourney,
   defaultProjects,
@@ -18,12 +19,44 @@ import {
   fallbackPortfolioData,
 } from "./defaults";
 import { aboutSettingsToStatistics, normalizeAboutSettings } from "./about-utils";
+import { contactSettingsToMethods, normalizeContactSettings } from "./contact-utils";
+import { buildPricingData } from "./pricing-utils";
+import {
+  normalizePricingCurrency,
+  normalizePricingFeature,
+  normalizePricingProjectType,
+  normalizePricingSettings,
+  normalizePricingTimeline,
+} from "./pricing-normalize";
+import { normalizeHeroSettings, resolveFeaturedProject } from "./hero-utils";
 import { projectStats } from "@/lib/projects-data";
 import { normalizeProject } from "./project-utils";
-import type { JourneyEntry } from "@/types/cms";
+import type {
+  JourneyEntry,
+  PricingCurrency,
+  PricingFeature,
+  PricingProjectType,
+  PricingSettings,
+  PricingTimelineOption,
+} from "@/types/cms";
+
+function logFetchDiagnostics(context: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV === "production" && !process.env.CMS_FETCH_DEBUG) return;
+  console.error(`[fetchPortfolioData] ${context}`, details);
+}
 
 export async function fetchPortfolioData(): Promise<PortfolioData> {
-  if (!isSupabaseConfigured()) return fallbackPortfolioData;
+  const hasUrl = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const hasKey = Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+  if (!isSupabaseConfigured()) {
+    logFetchDiagnostics("using full fallback — Supabase env not configured", {
+      hasUrl,
+      hasKey,
+      urlPreview: process.env.NEXT_PUBLIC_SUPABASE_URL?.slice(0, 32) ?? null,
+    });
+    return fallbackPortfolioData;
+  }
 
   try {
     const supabase = await createClient();
@@ -36,6 +69,12 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
       imagesRes,
       testimonialsRes,
       contactRes,
+      contactSettingsRes,
+      pricingSettingsRes,
+      pricingCurrenciesRes,
+      pricingProjectTypesRes,
+      pricingFeaturesRes,
+      pricingTimelinesRes,
       cvRes,
       seoRes,
       sectionsRes,
@@ -47,10 +86,27 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
       supabase.from("project_images").select("*").order("sort_order"),
       supabase.from("testimonials").select("*").eq("published", true).order("sort_order"),
       supabase.from("contact_methods").select("*").eq("published", true).order("sort_order"),
+      supabase.from("contact_settings").select("*").eq("id", 1).maybeSingle(),
+      supabase.from("pricing_settings").select("*").eq("id", 1).maybeSingle(),
+      supabase.from("pricing_currencies").select("*").order("sort_order"),
+      supabase.from("pricing_project_types").select("*").eq("published", true).order("sort_order"),
+      supabase.from("pricing_features").select("*").eq("published", true).order("sort_order"),
+      supabase.from("pricing_timeline_options").select("*").eq("published", true).order("sort_order"),
       supabase.from("cv_files").select("*").eq("is_active", true).maybeSingle(),
       supabase.from("seo_settings").select("*").eq("id", 1).maybeSingle(),
       supabase.from("section_content").select("*"),
     ]);
+
+    const projectsCount = projectsRes.data?.length ?? 0;
+    logFetchDiagnostics("Supabase query results", {
+      hasUrl,
+      hasKey,
+      projectsCount,
+      projectsError: projectsRes.error?.message ?? null,
+      projectsStatus: projectsRes.status,
+      imagesError: imagesRes.error?.message ?? null,
+      heroError: heroRes.error?.message ?? null,
+    });
 
     const imagesByProject = (imagesRes.data ?? []).reduce<Record<string, ProjectRecord["images"]>>(
       (acc, img) => {
@@ -66,7 +122,14 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
         ? projectsRes.data.map((p) =>
             normalizeProject(p as Record<string, unknown>, imagesByProject[p.id] ?? [])
           )
-        : defaultProjects;
+        : (() => {
+            logFetchDiagnostics("using defaultProjects — no published rows from Supabase", {
+              projectsCount,
+              projectsError: projectsRes.error?.message ?? null,
+              dataIsNull: projectsRes.data === null,
+            });
+            return defaultProjects;
+          })();
 
     const sections: Record<string, Record<string, unknown>> = { ...defaultSections };
     (sectionsRes.data ?? []).forEach((row) => {
@@ -85,24 +148,63 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
     const journey: JourneyEntry[] =
       journeyRes.data && journeyRes.data.length > 0 ? journeyRes.data : defaultJourney;
 
+    const contactSettings = contactSettingsRes.data
+      ? normalizeContactSettings(contactSettingsRes.data as Record<string, unknown>)
+      : defaultContactSettings;
+
+    const contactMethods = contactSettingsRes.data
+      ? contactSettingsToMethods(contactSettings)
+      : contactRes.data && contactRes.data.length > 0
+        ? contactRes.data
+        : defaultContactMethods;
+
+    const pricingSettings = pricingSettingsRes.data
+      ? normalizePricingSettings(pricingSettingsRes.data as Record<string, unknown>)
+      : defaultPricingData.settings;
+
+    const pricingData = buildPricingData(
+      pricingSettings,
+      (pricingCurrenciesRes.data?.length
+        ? (pricingCurrenciesRes.data as Record<string, unknown>[]).map(normalizePricingCurrency).filter((c) => c.enabled)
+        : defaultPricingData.currencies),
+      (pricingProjectTypesRes.data?.length
+        ? (pricingProjectTypesRes.data as Record<string, unknown>[]).map(normalizePricingProjectType)
+        : defaultPricingData.projectTypes),
+      (pricingFeaturesRes.data?.length
+        ? (pricingFeaturesRes.data as Record<string, unknown>[]).map(normalizePricingFeature)
+        : defaultPricingData.features),
+      (pricingTimelinesRes.data?.length
+        ? (pricingTimelinesRes.data as Record<string, unknown>[]).map(normalizePricingTimeline)
+        : defaultPricingData.timelineOptions)
+    );
+
+    const hero = heroRes.data
+      ? normalizeHeroSettings(heroRes.data as Record<string, unknown>)
+      : defaultHero;
+
+    const featuredProject = resolveFeaturedProject(hero, projects);
+
     return {
-      hero: (heroRes.data as HeroSettings) ?? defaultHero,
+      hero,
+      featuredProject,
       about,
       aboutStatistics: aboutSettingsToStatistics(about),
       journey,
       projects,
       projectStats: stats,
       testimonials: testimonialsRes.data ?? [],
-      contactMethods:
-        contactRes.data && contactRes.data.length > 0
-          ? contactRes.data
-          : defaultContactMethods,
+      contactSettings,
+      contactMethods,
+      pricingData,
       activeCv: cvRes.data ?? null,
       seo: (seoRes.data as SeoSettings) ?? defaultSeo,
       sections,
       source: "supabase",
     };
-  } catch {
+  } catch (error) {
+    logFetchDiagnostics("using full fallback — exception in fetch", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return fallbackPortfolioData;
   }
 }
@@ -113,6 +215,8 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     publishedProjects: 0,
     unreadMessages: 0,
     totalMessages: 0,
+    unreadLeads: 0,
+    totalLeads: 0,
     testimonials: 0,
     pageViews30d: 0,
     pageViewsToday: 0,
@@ -130,9 +234,10 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     const todayStart = new Date(now);
     todayStart.setHours(0, 0, 0, 0);
 
-    const [projects, messages, testimonials, analytics] = await Promise.all([
+    const [projects, messages, leads, testimonials, analytics] = await Promise.all([
       supabase.from("projects").select("id, published"),
       supabase.from("contact_messages").select("id, read, created_at"),
+      supabase.from("pricing_leads").select("id, read"),
       supabase.from("testimonials").select("id"),
       supabase
         .from("page_analytics")
@@ -141,6 +246,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     ]);
 
     const allMessages = messages.data ?? [];
+    const allLeads = leads.data ?? [];
     const views = analytics.data ?? [];
 
     const pageCounts: Record<string, number> = {};
@@ -168,6 +274,8 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
       publishedProjects: allProjects.filter((p) => p.published).length,
       unreadMessages: allMessages.filter((m) => !m.read).length,
       totalMessages: allMessages.length,
+      unreadLeads: allLeads.filter((l) => !l.read).length,
+      totalLeads: allLeads.length,
       testimonials: testimonials.data?.length ?? 0,
       pageViews30d: views.length,
       pageViewsToday: views.filter((v) => v.created_at >= todayStart.toISOString()).length,

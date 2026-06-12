@@ -34,6 +34,22 @@ insert into contact_methods (type, label, value, subtext, href, sort_order) valu
 ('linkedin', 'LinkedIn', 'mohamed-ournani', 'Let''s connect', 'https://linkedin.com', 2),
 ('github', 'GitHub', 'mohamedournani', 'View my code', 'https://github.com', 3);
 
+insert into contact_settings (
+  id, whatsapp, email, linkedin_url, linkedin_username, github_url, github_username,
+  contact_title, contact_subtitle, calendly_url
+) values (
+  1,
+  '+213 XXX XXX XXX',
+  'contact@mohamedournani.com',
+  'https://linkedin.com',
+  'mohamed-ournani',
+  'https://github.com',
+  'mohamedournani',
+  'Let''s Work Together',
+  'Have a project in mind or want to discuss an idea? I''m always open to new opportunities and exciting collaborations.',
+  ''
+) on conflict (id) do nothing;
+
 -- About & Journey (see also supabase/seed-about.sql)
 insert into about_settings (
   id, name, job_title, short_bio, who_i_am_title, who_i_am_paragraphs,

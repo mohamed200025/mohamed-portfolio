@@ -5,7 +5,10 @@ import { ArrowRight, Calendar } from "lucide-react";
 import { MagneticButton, ShimmerButton } from "@/components/ui/MagneticButton";
 import { fadeUp } from "@/lib/animations";
 
-export function ContactCTA() {
+export function ContactCTA({ calendlyUrl = "" }: { calendlyUrl?: string }) {
+  const meetingHref = calendlyUrl.trim() || "#contact";
+  const meetingExternal = Boolean(calendlyUrl.trim());
+
   return (
     <motion.div
       variants={fadeUp}
@@ -17,7 +20,12 @@ export function ContactCTA() {
           <ArrowRight className="h-4 w-4" />
         </MagneticButton>
       </ShimmerButton>
-      <MagneticButton href="#contact" variant="secondary" className="w-full sm:w-auto !px-6 !py-3.5">
+      <MagneticButton
+        href={meetingHref}
+        variant="secondary"
+        className="w-full sm:w-auto !px-6 !py-3.5"
+        external={meetingExternal}
+      >
         <Calendar className="h-4 w-4" />
         Schedule a Meeting
       </MagneticButton>

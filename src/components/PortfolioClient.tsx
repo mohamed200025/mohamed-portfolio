@@ -7,6 +7,7 @@ import { AboutSection } from "@/components/about/AboutSection";
 import { ServicesSection } from "@/components/services/ServicesSection";
 import { TechnologiesSection } from "@/components/technologies/TechnologiesSection";
 import { ContactSection } from "@/components/contact/ContactSection";
+import { CalculatorSection } from "@/components/calculator/CalculatorSection";
 import { TestimonialsSection } from "@/components/testimonials/TestimonialsSection";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 
@@ -15,7 +16,7 @@ export function PortfolioClient({ data }: { data: PortfolioData }) {
     <>
       <AnalyticsTracker />
       <main className="bg-black">
-        <Hero hero={data.hero} />
+        <Hero hero={data.hero} featuredProject={data.featuredProject} />
         <ProjectsSection
           projects={data.projects}
           projectStats={data.projectStats}
@@ -32,7 +33,9 @@ export function PortfolioClient({ data }: { data: PortfolioData }) {
         />
         <ServicesSection services={data.sections.services} />
         <TechnologiesSection technologies={data.sections.technologies} />
+        <CalculatorSection data={data.pricingData} />
         <ContactSection
+          contactSettings={data.contactSettings}
           contact={data.sections.contact}
           contactMethods={data.contactMethods}
           footer={data.sections.footer}

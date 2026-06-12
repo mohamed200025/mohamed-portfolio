@@ -5,14 +5,20 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { ProjectImage, ProjectRecord } from "@/types/cms";
 import {
+  buildCaseStudyPayload,
+  buildCoreProjectPayload,
   formatResultsInput,
   formatStatisticsInput,
+  isMissingColumnError,
+  isSingleRowCoercionError,
   normalizeProject,
   parseLinesInput,
   parseResultsInput,
   parseStatisticsInput,
+  pickSavedProjectRow,
 } from "@/lib/cms/project-utils";
 import { AdminFormField, adminInputClass, adminTextareaClass } from "./AdminFormField";
+import { AdminSelect } from "./AdminSelect";
 import { Plus, Save, Trash2, Upload } from "lucide-react";
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
@@ -100,51 +106,98 @@ export function ProjectsManager() {
     setSaving(true);
     setMessage("");
     const supabase = createClient();
-    const payload = {
-      slug: selected.slug,
-      title: selected.title,
-      category: selected.category,
-      description: selected.description,
-      features: selected.features,
-      technologies: selected.technologies,
-      primary_button_label: selected.primary_button_label,
-      primary_button_href: selected.primary_button_href,
-      primary_button_external: selected.primary_button_external,
-      secondary_button_label: selected.secondary_button_label,
-      secondary_button_href: selected.secondary_button_href,
-      website_url: selected.website_url?.trim() || null,
-      details_url: selected.details_url?.trim() || null,
-      live_demo_url: selected.live_demo_url?.trim() || null,
-      project_overview: selected.project_overview?.trim() || null,
-      problem_statement: selected.problem_statement?.trim() || null,
-      solution: selected.solution?.trim() || null,
-      business_impact: selected.business_impact?.trim() || null,
-      project_year: selected.project_year?.trim() || null,
-      project_duration: selected.project_duration?.trim() || null,
-      client_name: selected.client_name?.trim() || null,
-      industry: selected.industry?.trim() || null,
-      gallery_images: selected.gallery_images ?? [],
-      statistics: selected.statistics ?? [],
-      results: selected.results ?? [],
-      challenges: selected.challenges ?? [],
-      solutions: selected.solutions ?? [],
-      featured: selected.featured,
-      accent: selected.accent,
-      showcase_type: selected.showcase_type,
-      icon_name: selected.icon_name,
-      sort_order: selected.sort_order,
-      published: selected.published,
-      updated_at: new Date().toISOString(),
+    const corePayload = buildCoreProjectPayload(selected);
+    const caseStudyPayload = buildCaseStudyPayload(selected);
+
+    const persistCaseStudy = async (projectId: string) => {
+      const { error } = await supabase
+        .from("projects")
+        .update(caseStudyPayload)
+        .eq("id", projectId);
+
+      if (!error) return null;
+      if (isMissingColumnError(error)) {
+        return "Project links saved. Run supabase/migrations/20250612_project_case_study_fields.sql to enable case study fields.";
+      }
+      return `Project links saved. Case study fields failed: ${error.message}`;
     };
 
     if (selected.id && !selected.id.startsWith("new-")) {
-      const { error } = await supabase.from("projects").update(payload).eq("id", selected.id);
-      setMessage(error ? error.message : "Project updated!");
+      console.info("[ProjectsManager] save update", {
+        projectId: selected.id,
+        payload: corePayload,
+      });
+
+      const { data: savedRows, error } = await supabase
+        .from("projects")
+        .update(corePayload)
+        .eq("id", selected.id)
+        .select("*");
+
+      console.info("[ProjectsManager] save update result", {
+        projectId: selected.id,
+        rowCount: savedRows?.length ?? 0,
+        error: error?.message ?? null,
+      });
+
+      if (error && !isSingleRowCoercionError(error)) {
+        setMessage(error.message);
+        setSaving(false);
+        return;
+      }
+
+      const saved = pickSavedProjectRow(
+        savedRows as Record<string, unknown>[] | null,
+        selected.id
+      );
+
+      if (!saved) {
+        setMessage("Update failed — no rows returned. Sign in again and retry.");
+        setSaving(false);
+        return;
+      }
+
+      const caseStudyMessage = await persistCaseStudy(selected.id);
+      const normalized = normalizeProject(saved);
+      selectProject(normalized);
+      await loadProjects();
+      setMessage(caseStudyMessage ?? "Project updated!");
     } else {
-      const { data, error } = await supabase.from("projects").insert(payload).select().single();
-      if (data) selectProject(data as ProjectRecord);
-      setMessage(error ? error.message : "Project created!");
-      loadProjects();
+      console.info("[ProjectsManager] save insert", {
+        projectId: selected.id,
+        payload: corePayload,
+      });
+
+      const { data: createdRows, error } = await supabase
+        .from("projects")
+        .insert(corePayload)
+        .select("*");
+
+      console.info("[ProjectsManager] save insert result", {
+        projectId: selected.id,
+        rowCount: createdRows?.length ?? 0,
+        error: error?.message ?? null,
+      });
+
+      if (error && !isSingleRowCoercionError(error)) {
+        setMessage(error.message);
+        setSaving(false);
+        return;
+      }
+
+      const created = pickSavedProjectRow(createdRows as Record<string, unknown>[] | null);
+
+      if (!created) {
+        setMessage("Create failed — no row returned.");
+        setSaving(false);
+        return;
+      }
+
+      const caseStudyMessage = await persistCaseStudy(created.id as string);
+      const normalized = normalizeProject(created);
+      selectProject(normalized);
+      await loadProjects();
+      setMessage(caseStudyMessage ?? "Project created!");
     }
     setSaving(false);
   };
@@ -387,21 +440,27 @@ export function ProjectsManager() {
 
           <div className="grid gap-4 sm:grid-cols-3">
             <AdminFormField label="Showcase Type">
-              <select
-                className={adminInputClass}
+              <AdminSelect
                 value={selected.showcase_type}
-                onChange={(e) => setSelected({ ...selected, showcase_type: e.target.value as ProjectRecord["showcase_type"] })}
-              >
-                <option value="eduvera">Eduvera</option>
-                <option value="muhlentechnik">Muhlentechnik</option>
-                <option value="custom">Custom</option>
-              </select>
+                onChange={(showcase_type) =>
+                  setSelected({ ...selected, showcase_type: showcase_type as ProjectRecord["showcase_type"] })
+                }
+                options={[
+                  { value: "eduvera", label: "Eduvera" },
+                  { value: "muhlentechnik", label: "Muhlentechnik" },
+                  { value: "custom", label: "Custom" },
+                ]}
+              />
             </AdminFormField>
             <AdminFormField label="Accent">
-              <select className={adminInputClass} value={selected.accent} onChange={(e) => setSelected({ ...selected, accent: e.target.value as "cyan" | "blue" })}>
-                <option value="cyan">Cyan</option>
-                <option value="blue">Blue</option>
-              </select>
+              <AdminSelect
+                value={selected.accent}
+                onChange={(accent) => setSelected({ ...selected, accent: accent as "cyan" | "blue" })}
+                options={[
+                  { value: "cyan", label: "Cyan" },
+                  { value: "blue", label: "Blue" },
+                ]}
+              />
             </AdminFormField>
             <AdminFormField label="Sort Order">
               <input type="number" className={adminInputClass} value={selected.sort_order} onChange={(e) => setSelected({ ...selected, sort_order: Number(e.target.value) })} />

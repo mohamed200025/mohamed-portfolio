@@ -35,11 +35,5 @@ export default async function ProjectPage({ params }: PageProps) {
 
   if (!data) notFound();
 
-  return (
-    <ProjectDetailsPage
-      data={data}
-      heroName={portfolio.hero.profile_name}
-      heroTitle={portfolio.hero.profile_title}
-    />
-  );
+  return <ProjectDetailsPage data={data} />;
 }

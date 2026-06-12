@@ -12,7 +12,7 @@ import { MagneticButton, ShimmerButton } from "@/components/ui/MagneticButton";
 import { fadeUp } from "@/lib/animations";
 import type { ProjectRecord } from "@/types/cms";
 import { getIcon } from "@/lib/icons";
-import { getWebsiteUrl, projectDetailsPath, shouldShowWebsiteButton } from "@/lib/cms/project-utils";
+import { getWebsiteUrl, projectDetailsPath } from "@/lib/cms/project-utils";
 
 interface ProjectCardProps {
   project: ProjectRecord;
@@ -47,7 +47,7 @@ export function ProjectCard({
   const styles = accentStyles[project.accent];
   const Icon = getIcon(project.icon_name);
   const websiteUrl = getWebsiteUrl(project);
-  const showWebsite = shouldShowWebsiteButton(project);
+  const showWebsite = Boolean(websiteUrl);
   const detailsPath = projectDetailsPath(project.slug);
 
   return (

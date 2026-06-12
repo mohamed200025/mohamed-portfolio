@@ -5,12 +5,18 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { HeroBackground } from "./HeroBackground";
 import { Navbar } from "./Navbar";
 import { HeroContent } from "./HeroContent";
-import { DeviceShowcase } from "./DeviceShowcase";
+import { HeroShowcase } from "./HeroShowcase";
 import { ScrollIndicator } from "@/components/ui/ScrollIndicator";
-import type { HeroSettings } from "@/types/cms";
+import type { HeroSettings, ProjectRecord } from "@/types/cms";
 import { defaultHero } from "@/lib/cms/defaults";
 
-export function Hero({ hero = defaultHero }: { hero?: HeroSettings }) {
+export function Hero({
+  hero = defaultHero,
+  featuredProject,
+}: {
+  hero?: HeroSettings;
+  featuredProject?: ProjectRecord | null;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -28,7 +34,7 @@ export function Hero({ hero = defaultHero }: { hero?: HeroSettings }) {
       className="relative min-h-screen overflow-hidden"
     >
       <HeroBackground />
-      <Navbar name={hero.profile_name} title={hero.profile_title} />
+      <Navbar />
 
       <motion.div style={{ opacity }} className="relative z-10">
         <div className="mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pb-24 pt-28 lg:px-8 lg:pb-20 lg:pt-32">
@@ -38,7 +44,7 @@ export function Hero({ hero = defaultHero }: { hero?: HeroSettings }) {
             </motion.div>
 
             <motion.div style={{ y: showcaseY }} className="relative">
-              <DeviceShowcase />
+              {featuredProject ? <HeroShowcase project={featuredProject} /> : null}
             </motion.div>
           </div>
         </div>

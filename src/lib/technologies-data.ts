@@ -141,5 +141,6 @@ export const footerLinks = [
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   { label: "Technologies", href: "#technologies" },
+  { label: "Calculator", href: "#calculator" },
   { label: "Contact", href: "#contact" },
 ];

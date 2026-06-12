@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, Send, X } from "lucide-react";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { fadeIn } from "@/lib/animations";
 
 const navLinks = [
@@ -14,13 +15,7 @@ const navLinks = [
   { label: "Contact", href: "/#contact" },
 ];
 
-export function ProjectPageNav({
-  name = "Mohamed Ournani",
-  title = "Full Stack & Flutter Developer",
-}: {
-  name?: string;
-  title?: string;
-}) {
+export function ProjectPageNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -30,16 +25,8 @@ export function ProjectPageNav({
       initial="hidden"
       animate="visible"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        <Link href="/" className="group flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-violet-600 shadow-lg shadow-blue-500/20">
-            <span className="text-sm font-bold text-white">MO</span>
-          </div>
-          <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-white">{name}</p>
-            <p className="text-[11px] text-white/40">{title}</p>
-          </div>
-        </Link>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 lg:px-8 lg:py-3.5">
+        <BrandLogo href="/#home" />
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => (
