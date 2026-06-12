@@ -4,17 +4,21 @@ import { motion } from "framer-motion";
 import { FolderKanban, Globe2, Layers, Wrench } from "lucide-react";
 import { CountUp } from "@/components/ui/CountUp";
 import { fadeUp } from "@/lib/animations";
-import { statistics as defaultStatistics } from "@/lib/about-data";
+import type { AboutStatistic } from "@/types/cms";
+import { defaultAboutStatistics } from "@/lib/cms/defaults";
 
-const icons = [FolderKanban, Wrench, Layers, Globe2];
+const iconMap = {
+  folder: FolderKanban,
+  wrench: Wrench,
+  layers: Layers,
+  globe: Globe2,
+};
 
-type StatItem = (typeof defaultStatistics)[number];
-
-export function StatisticsCards({ statistics = defaultStatistics }: { statistics?: readonly StatItem[] }) {
+export function StatisticsCards({ statistics = defaultAboutStatistics }: { statistics?: AboutStatistic[] }) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4">
       {statistics.map((stat, i) => {
-        const Icon = icons[i];
+        const Icon = iconMap[stat.iconKey as keyof typeof iconMap] ?? FolderKanban;
 
         return (
           <motion.div
@@ -27,10 +31,8 @@ export function StatisticsCards({ statistics = defaultStatistics }: { statistics
             transition={{ delay: i * 0.08 }}
             whileHover={{ y: -5, scale: 1.02 }}
           >
-            {/* Border glow on hover */}
             <div className="pointer-events-none absolute -inset-px rounded-xl bg-gradient-to-br from-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-            {/* Floating particle accent */}
             <motion.div
               className="absolute right-3 top-3 h-1 w-1 rounded-full bg-white/30"
               animate={{ y: [0, -6, 0], opacity: [0.2, 0.6, 0.2] }}
@@ -45,12 +47,8 @@ export function StatisticsCards({ statistics = defaultStatistics }: { statistics
               <p className="text-2xl font-bold text-white sm:text-3xl">
                 <CountUp value={stat.value} suffix={stat.suffix} />
               </p>
-              <p className="mt-1 text-xs font-medium text-white/80 sm:text-sm">
-                {stat.label}
-              </p>
-              <p className="mt-0.5 text-[10px] text-white/40 sm:text-xs">
-                {stat.tag}
-              </p>
+              <p className="mt-1 text-xs font-medium text-white/80 sm:text-sm">{stat.label}</p>
+              <p className="mt-0.5 text-[10px] text-white/40 sm:text-xs">{stat.tag}</p>
             </div>
           </motion.div>
         );

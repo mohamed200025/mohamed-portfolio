@@ -25,8 +25,9 @@ export function PortfolioClient({ data }: { data: PortfolioData }) {
           <TestimonialsSection testimonials={data.testimonials} />
         )}
         <AboutSection
-          about={data.sections.about}
-          hero={data.hero}
+          about={data.about}
+          aboutStatistics={data.aboutStatistics}
+          journey={data.journey}
           activeCv={data.activeCv}
         />
         <ServicesSection services={data.sections.services} />

@@ -1,7 +1,6 @@
 import type { PortfolioData } from "@/types/cms";
 
 const SECTION_TEXT_KEYS: Record<string, string[]> = {
-  about: ["badge", "title_prefix", "title_highlight", "subtitle", "who_i_am"],
   projects_header: ["badge", "title", "subtitle"],
   services: ["badge", "title_prefix", "title_highlight", "subtitle", "cta"],
   technologies: ["badge", "title_prefix", "title_highlight", "subtitle"],

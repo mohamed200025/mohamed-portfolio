@@ -4,8 +4,23 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { ProjectImage, ProjectRecord } from "@/types/cms";
+import {
+  formatResultsInput,
+  formatStatisticsInput,
+  parseLinesInput,
+  parseResultsInput,
+  parseStatisticsInput,
+} from "@/lib/cms/project-utils";
 import { AdminFormField, adminInputClass, adminTextareaClass } from "./AdminFormField";
 import { Plus, Save, Trash2, Upload } from "lucide-react";
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="border-b border-white/10 pb-2 text-sm font-semibold uppercase tracking-wider text-cyan-400">
+      {children}
+    </h3>
+  );
+}
 
 const emptyProject = (): Partial<ProjectRecord> => ({
   slug: "",
@@ -21,6 +36,20 @@ const emptyProject = (): Partial<ProjectRecord> => ({
   secondary_button_href: "#",
   website_url: "",
   details_url: "",
+  live_demo_url: "",
+  project_overview: "",
+  problem_statement: "",
+  solution: "",
+  business_impact: "",
+  project_year: "",
+  project_duration: "",
+  client_name: "",
+  industry: "",
+  gallery_images: [],
+  statistics: [],
+  results: [],
+  challenges: [],
+  solutions: [],
   featured: false,
   accent: "cyan",
   showcase_type: "custom",
@@ -40,7 +69,18 @@ export function ProjectsManager() {
   const loadProjects = async () => {
     const supabase = createClient();
     const { data } = await supabase.from("projects").select("*").order("sort_order");
-    setProjects((data as ProjectRecord[]) ?? []);
+    setProjects(
+      (data ?? []).map((row) => ({
+        ...(row as ProjectRecord),
+        features: (row.features as string[]) ?? [],
+        technologies: (row.technologies as string[]) ?? [],
+        statistics: (row.statistics as ProjectRecord["statistics"]) ?? [],
+        results: (row.results as ProjectRecord["results"]) ?? [],
+        challenges: (row.challenges as string[]) ?? [],
+        solutions: (row.solutions as string[]) ?? [],
+        gallery_images: (row.gallery_images as string[]) ?? [],
+      }))
+    );
     setLoading(false);
   };
 
@@ -84,6 +124,20 @@ export function ProjectsManager() {
       secondary_button_href: selected.secondary_button_href,
       website_url: selected.website_url?.trim() || null,
       details_url: selected.details_url?.trim() || null,
+      live_demo_url: selected.live_demo_url?.trim() || null,
+      project_overview: selected.project_overview?.trim() || null,
+      problem_statement: selected.problem_statement?.trim() || null,
+      solution: selected.solution?.trim() || null,
+      business_impact: selected.business_impact?.trim() || null,
+      project_year: selected.project_year?.trim() || null,
+      project_duration: selected.project_duration?.trim() || null,
+      client_name: selected.client_name?.trim() || null,
+      industry: selected.industry?.trim() || null,
+      gallery_images: selected.gallery_images ?? [],
+      statistics: selected.statistics ?? [],
+      results: selected.results ?? [],
+      challenges: selected.challenges ?? [],
+      solutions: selected.solutions ?? [],
       featured: selected.featured,
       accent: selected.accent,
       showcase_type: selected.showcase_type,
@@ -214,6 +268,10 @@ export function ProjectsManager() {
             />
           </AdminFormField>
 
+          <SectionHeading>Links &amp; CTAs</SectionHeading>
+          <p className="text-xs text-white/40">
+            Project Details opens at /projects/[slug] automatically. Set Website URL and optional Live Demo below.
+          </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <AdminFormField label="Website URL">
               <input
@@ -224,16 +282,118 @@ export function ProjectsManager() {
                 placeholder="https://example.com"
               />
             </AdminFormField>
-            <AdminFormField label="Project Details URL">
+            <AdminFormField label="Live Demo URL">
               <input
                 type="url"
                 className={adminInputClass}
-                value={selected.details_url ?? ""}
-                onChange={(e) => setSelected({ ...selected, details_url: e.target.value })}
-                placeholder="https://example.com/case-study"
+                value={selected.live_demo_url ?? ""}
+                onChange={(e) => setSelected({ ...selected, live_demo_url: e.target.value })}
+                placeholder="https://demo.example.com"
               />
             </AdminFormField>
           </div>
+
+          <SectionHeading>Case Study Content</SectionHeading>
+
+          <AdminFormField label="Project Overview">
+            <textarea
+              className={adminTextareaClass}
+              rows={4}
+              value={selected.project_overview ?? ""}
+              onChange={(e) => setSelected({ ...selected, project_overview: e.target.value })}
+            />
+          </AdminFormField>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <AdminFormField label="Problem Statement">
+              <textarea
+                className={adminTextareaClass}
+                rows={4}
+                value={selected.problem_statement ?? ""}
+                onChange={(e) => setSelected({ ...selected, problem_statement: e.target.value })}
+              />
+            </AdminFormField>
+            <AdminFormField label="Solution">
+              <textarea
+                className={adminTextareaClass}
+                rows={4}
+                value={selected.solution ?? ""}
+                onChange={(e) => setSelected({ ...selected, solution: e.target.value })}
+              />
+            </AdminFormField>
+          </div>
+
+          <AdminFormField label="Business Impact">
+            <textarea
+              className={adminTextareaClass}
+              rows={3}
+              value={selected.business_impact ?? ""}
+              onChange={(e) => setSelected({ ...selected, business_impact: e.target.value })}
+            />
+          </AdminFormField>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <AdminFormField label="Client Name">
+              <input className={adminInputClass} value={selected.client_name ?? ""} onChange={(e) => setSelected({ ...selected, client_name: e.target.value })} />
+            </AdminFormField>
+            <AdminFormField label="Industry">
+              <input className={adminInputClass} value={selected.industry ?? ""} onChange={(e) => setSelected({ ...selected, industry: e.target.value })} />
+            </AdminFormField>
+            <AdminFormField label="Project Year">
+              <input className={adminInputClass} value={selected.project_year ?? ""} onChange={(e) => setSelected({ ...selected, project_year: e.target.value })} />
+            </AdminFormField>
+            <AdminFormField label="Project Duration">
+              <input className={adminInputClass} value={selected.project_duration ?? ""} onChange={(e) => setSelected({ ...selected, project_duration: e.target.value })} />
+            </AdminFormField>
+          </div>
+
+          <AdminFormField label="Statistics (one per line: Label | Value | icon)">
+            <textarea
+              className={adminTextareaClass}
+              rows={5}
+              value={formatStatisticsInput(selected.statistics ?? [])}
+              onChange={(e) => setSelected({ ...selected, statistics: parseStatisticsInput(e.target.value) })}
+              placeholder={"Total Students | 2,847+ | users\nActive Courses | 48 | book"}
+            />
+          </AdminFormField>
+
+          <AdminFormField label="Results (one per line: Label | Value | description)">
+            <textarea
+              className={adminTextareaClass}
+              rows={4}
+              value={formatResultsInput(selected.results ?? [])}
+              onChange={(e) => setSelected({ ...selected, results: parseResultsInput(e.target.value) })}
+              placeholder={"User Growth | +340% | Increased enrollment"}
+            />
+          </AdminFormField>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <AdminFormField label="Challenges (one per line)">
+              <textarea
+                className={adminTextareaClass}
+                rows={5}
+                value={(selected.challenges ?? []).join("\n")}
+                onChange={(e) => setSelected({ ...selected, challenges: parseLinesInput(e.target.value) })}
+              />
+            </AdminFormField>
+            <AdminFormField label="Solutions (one per line)">
+              <textarea
+                className={adminTextareaClass}
+                rows={5}
+                value={(selected.solutions ?? []).join("\n")}
+                onChange={(e) => setSelected({ ...selected, solutions: parseLinesInput(e.target.value) })}
+              />
+            </AdminFormField>
+          </div>
+
+          <AdminFormField label="Gallery Image URLs (one per line, in addition to uploads)">
+            <textarea
+              className={adminTextareaClass}
+              rows={3}
+              value={(selected.gallery_images ?? []).join("\n")}
+              onChange={(e) => setSelected({ ...selected, gallery_images: parseLinesInput(e.target.value) })}
+            />
+          </AdminFormField>
 
           <div className="grid gap-4 sm:grid-cols-3">
             <AdminFormField label="Showcase Type">

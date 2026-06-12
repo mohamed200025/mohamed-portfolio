@@ -14,6 +14,8 @@ import {
   Search,
   Sparkles,
   Star,
+  UserCircle,
+  Route,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -22,6 +24,8 @@ const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/hero", label: "Hero", icon: Sparkles },
   { href: "/admin/projects", label: "Projects", icon: Briefcase },
+  { href: "/admin/about", label: "About", icon: UserCircle },
+  { href: "/admin/journey", label: "Journey", icon: Route },
   { href: "/admin/testimonials", label: "Testimonials", icon: Star },
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/cv", label: "CV Uploads", icon: FileText },

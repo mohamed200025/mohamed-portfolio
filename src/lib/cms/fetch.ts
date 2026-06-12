@@ -7,14 +7,20 @@ import type {
   SeoSettings,
 } from "@/types/cms";
 import {
+  defaultAbout,
+  defaultAboutStatistics,
   defaultContactMethods,
   defaultHero,
+  defaultJourney,
   defaultProjects,
   defaultSections,
   defaultSeo,
   fallbackPortfolioData,
 } from "./defaults";
+import { aboutSettingsToStatistics, normalizeAboutSettings } from "./about-utils";
 import { projectStats } from "@/lib/projects-data";
+import { normalizeProject } from "./project-utils";
+import type { JourneyEntry } from "@/types/cms";
 
 export async function fetchPortfolioData(): Promise<PortfolioData> {
   if (!isSupabaseConfigured()) return fallbackPortfolioData;
@@ -24,6 +30,8 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
 
     const [
       heroRes,
+      aboutRes,
+      journeyRes,
       projectsRes,
       imagesRes,
       testimonialsRes,
@@ -33,6 +41,8 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
       sectionsRes,
     ] = await Promise.all([
       supabase.from("hero_settings").select("*").eq("id", 1).maybeSingle(),
+      supabase.from("about_settings").select("*").eq("id", 1).maybeSingle(),
+      supabase.from("journey_entries").select("*").eq("published", true).order("sort_order"),
       supabase.from("projects").select("*").eq("published", true).order("sort_order"),
       supabase.from("project_images").select("*").order("sort_order"),
       supabase.from("testimonials").select("*").eq("published", true).order("sort_order"),
@@ -53,12 +63,9 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
 
     const projects: ProjectRecord[] =
       projectsRes.data && projectsRes.data.length > 0
-        ? projectsRes.data.map((p) => ({
-            ...p,
-            features: p.features as string[],
-            technologies: p.technologies as string[],
-            images: imagesByProject[p.id] ?? [],
-          }))
+        ? projectsRes.data.map((p) =>
+            normalizeProject(p as Record<string, unknown>, imagesByProject[p.id] ?? [])
+          )
         : defaultProjects;
 
     const sections: Record<string, Record<string, unknown>> = { ...defaultSections };
@@ -71,8 +78,18 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
       (projectsHeader.stats as { label: string; icon: string }[]) ??
       projectStats.map((s) => ({ label: s.label, icon: s.icon }));
 
+    const about = aboutRes.data
+      ? normalizeAboutSettings(aboutRes.data as Record<string, unknown>)
+      : defaultAbout;
+
+    const journey: JourneyEntry[] =
+      journeyRes.data && journeyRes.data.length > 0 ? journeyRes.data : defaultJourney;
+
     return {
       hero: (heroRes.data as HeroSettings) ?? defaultHero,
+      about,
+      aboutStatistics: aboutSettingsToStatistics(about),
+      journey,
       projects,
       projectStats: stats,
       testimonials: testimonialsRes.data ?? [],

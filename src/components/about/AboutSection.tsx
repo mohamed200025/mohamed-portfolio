@@ -9,16 +9,18 @@ import { WhoIAmCard } from "./WhoIAmCard";
 import { StatisticsCards } from "./StatisticsCards";
 import { JourneyTimeline } from "./JourneyTimeline";
 import { SkillsGrid } from "./SkillsGrid";
-import type { CvFile, HeroSettings } from "@/types/cms";
-import { defaultHero, defaultSections } from "@/lib/cms/defaults";
+import type { AboutSettings, AboutStatistic, CvFile, JourneyEntry } from "@/types/cms";
+import { defaultAbout, defaultAboutStatistics, defaultJourney } from "@/lib/cms/defaults";
 
 export function AboutSection({
-  about = defaultSections.about,
-  hero = defaultHero,
+  about = defaultAbout,
+  aboutStatistics = defaultAboutStatistics,
+  journey = defaultJourney,
   activeCv = null,
 }: {
-  about?: Record<string, unknown>;
-  hero?: HeroSettings;
+  about?: AboutSettings;
+  aboutStatistics?: AboutStatistic[];
+  journey?: JourneyEntry[];
   activeCv?: CvFile | null;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -44,13 +46,22 @@ export function AboutSection({
 
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-8 xl:gap-10">
           <div className="flex flex-col gap-6">
-            <ProfileCard name={hero.profile_name} title={hero.profile_title} />
-            <WhoIAmCard whoIAm={about.who_i_am as Record<string, unknown>} cvUrl={activeCv?.public_url} />
+            <ProfileCard
+              name={about.name}
+              title={about.job_title}
+              statusBadge={about.status_badge}
+              photoUrl={about.profile_photo_url}
+            />
+            <WhoIAmCard
+              title={about.who_i_am_title}
+              paragraphs={about.who_i_am_paragraphs}
+              cvUrl={activeCv?.public_url}
+            />
           </div>
 
           <div className="flex flex-col gap-6">
-            <StatisticsCards />
-            <JourneyTimeline />
+            <StatisticsCards statistics={aboutStatistics} />
+            <JourneyTimeline journey={journey} />
           </div>
         </div>
 

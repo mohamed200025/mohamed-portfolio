@@ -1,29 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { SectionBackground } from "./SectionBackground";
 import { SectionHeader } from "./SectionHeader";
 import { ProjectCard } from "./ProjectCard";
-import { EduveraShowcase } from "./EduveraShowcase";
-import { MuhlentechnikShowcase } from "./MuhlentechnikShowcase";
+import { ProjectShowcase } from "./ProjectShowcase";
 import type { ProjectRecord } from "@/types/cms";
 import { defaultSections } from "@/lib/cms/defaults";
-
-function getShowcase(project: ProjectRecord) {
-  if (project.showcase_type === "eduvera") return <EduveraShowcase />;
-  if (project.showcase_type === "muhlentechnik") return <MuhlentechnikShowcase />;
-  const cover = project.images?.find((i) => i.is_cover) ?? project.images?.[0];
-  if (cover) {
-    return (
-      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/10">
-        <Image src={cover.url} alt={cover.alt_text ?? project.title} fill className="object-cover" />
-      </div>
-    );
-  }
-  return <EduveraShowcase />;
-}
 
 interface ProjectsSectionProps {
   projects: ProjectRecord[];
@@ -64,7 +48,7 @@ export function ProjectsSection({
               project={project}
               index={index}
               reversed={index % 2 === 1}
-              showcase={getShowcase(project)}
+              showcase={<ProjectShowcase project={project} priority={index === 0} />}
             />
           ))}
         </div>

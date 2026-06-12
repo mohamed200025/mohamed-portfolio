@@ -4,19 +4,19 @@ import { motion } from "framer-motion";
 import { ArrowRight, Download, User } from "lucide-react";
 import { MagneticButton, ShimmerButton } from "@/components/ui/MagneticButton";
 import { fadeUp, staggerContainer } from "@/lib/animations";
+import { hasUrl } from "@/lib/cms/project-utils";
 
 export function WhoIAmCard({
-  whoIAm,
+  title = "Who I Am",
+  paragraphs = [],
   cvUrl,
 }: {
-  whoIAm?: Record<string, unknown>;
+  title?: string;
+  paragraphs?: string[];
   cvUrl?: string;
 }) {
-  const title = (whoIAm?.title as string) ?? "Who I Am";
-  const paragraphs = (whoIAm?.paragraphs as string[]) ?? [
-    "I'm a passionate Full Stack & Flutter Developer focused on building scalable digital products, educational platforms, custom CMS systems and modern business applications.",
-    "With experience in web development, mobile applications and administrative dashboards, I transform ideas into professional and user-friendly digital solutions.",
-  ];
+  const showCv = hasUrl(cvUrl);
+
   return (
     <motion.div
       className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 backdrop-blur-md sm:p-8"
@@ -37,27 +37,33 @@ export function WhoIAmCard({
       </motion.div>
 
       {paragraphs.map((p, i) => (
-        <motion.p key={i} variants={fadeUp} className={`relative text-sm leading-relaxed text-white/50 sm:text-base ${i === paragraphs.length - 1 ? "mb-6" : "mb-4"}`}>
+        <motion.p
+          key={i}
+          variants={fadeUp}
+          className={`relative text-sm leading-relaxed text-white/50 sm:text-base ${i === paragraphs.length - 1 ? "mb-6" : "mb-4"}`}
+        >
           {p}
         </motion.p>
       ))}
 
-      <motion.div variants={fadeUp} className="relative">
-        <ShimmerButton className="w-full">
-          <MagneticButton href={cvUrl ?? "#"} variant="primary" className="w-full !justify-between !px-5 !py-4">
-            <span className="flex items-center gap-3">
-              <Download className="h-4 w-4" />
-              <span className="text-left">
-                <span className="block text-sm font-medium">Download CV</span>
-                <span className="block text-[11px] font-normal text-white/60">
-                  Get my resume in PDF format
+      {showCv && (
+        <motion.div variants={fadeUp} className="relative">
+          <ShimmerButton className="w-full">
+            <MagneticButton href={cvUrl!} variant="primary" external className="w-full !justify-between !px-5 !py-4">
+              <span className="flex items-center gap-3">
+                <Download className="h-4 w-4" />
+                <span className="text-left">
+                  <span className="block text-sm font-medium">Download CV</span>
+                  <span className="block text-[11px] font-normal text-white/60">
+                    Get my resume in PDF format
+                  </span>
                 </span>
               </span>
-            </span>
-            <ArrowRight className="h-4 w-4 shrink-0" />
-          </MagneticButton>
-        </ShimmerButton>
-      </motion.div>
+              <ArrowRight className="h-4 w-4 shrink-0" />
+            </MagneticButton>
+          </ShimmerButton>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

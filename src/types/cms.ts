@@ -20,6 +20,18 @@ export interface TechStackItem {
   color?: string;
 }
 
+export interface ProjectStatistic {
+  label: string;
+  value: string;
+  icon?: string;
+}
+
+export interface ProjectResult {
+  label: string;
+  value: string;
+  description?: string;
+}
+
 export interface ProjectRecord {
   id: string;
   slug: string;
@@ -35,6 +47,21 @@ export interface ProjectRecord {
   secondary_button_href: string;
   website_url?: string | null;
   details_url?: string | null;
+  project_details_url?: string | null;
+  live_demo_url?: string | null;
+  project_overview?: string | null;
+  problem_statement?: string | null;
+  solution?: string | null;
+  business_impact?: string | null;
+  project_year?: string | null;
+  project_duration?: string | null;
+  client_name?: string | null;
+  industry?: string | null;
+  gallery_images?: string[];
+  statistics?: ProjectStatistic[];
+  results?: ProjectResult[];
+  challenges?: string[];
+  solutions?: string[];
   featured: boolean;
   accent: "cyan" | "blue";
   showcase_type: "eduvera" | "muhlentechnik" | "custom";
@@ -87,6 +114,53 @@ export interface ContactMessage {
   created_at: string;
 }
 
+export interface AboutSettings {
+  profile_photo_url?: string | null;
+  profile_photo_storage_path?: string | null;
+  name: string;
+  job_title: string;
+  short_bio: string;
+  status_badge: string;
+  section_badge: string;
+  title_prefix: string;
+  title_highlight: string;
+  who_i_am_title: string;
+  who_i_am_paragraphs: string[];
+  stat_projects_value: number;
+  stat_projects_suffix: string;
+  stat_projects_tag: string;
+  stat_technologies_value: number;
+  stat_technologies_suffix: string;
+  stat_technologies_tag: string;
+  stat_platforms_value: number;
+  stat_platforms_suffix: string;
+  stat_platforms_tag: string;
+  stat_countries_value: number;
+  stat_countries_suffix: string;
+  stat_countries_tag: string;
+}
+
+export interface AboutStatistic {
+  value: number;
+  suffix: string;
+  label: string;
+  tag: string;
+  color: string;
+  iconColor: string;
+  iconKey: string;
+}
+
+export interface JourneyEntry {
+  id: string;
+  year: string;
+  title: string;
+  description: string;
+  icon_name: string;
+  node_color: string;
+  sort_order: number;
+  published: boolean;
+}
+
 export interface CvFile {
   id: string;
   file_name: string;
@@ -113,6 +187,9 @@ export interface SectionContent {
 
 export interface PortfolioData {
   hero: HeroSettings;
+  about: AboutSettings;
+  aboutStatistics: AboutStatistic[];
+  journey: JourneyEntry[];
   projects: ProjectRecord[];
   projectStats: { label: string; icon: string }[];
   testimonials: Testimonial[];

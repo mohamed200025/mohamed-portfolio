@@ -1,14 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
 
 export function ProfileCard({
   name = "Mohamed Ournani",
   title = "Full Stack & Flutter Developer",
+  statusBadge = "Available for new projects",
+  photoUrl,
 }: {
   name?: string;
   title?: string;
+  statusBadge?: string;
+  photoUrl?: string | null;
 }) {
   return (
     <motion.div
@@ -29,7 +34,7 @@ export function ProfileCard({
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
         </span>
-        <span className="text-xs text-white/70">Available for new projects</span>
+        <span className="text-xs text-white/70">{statusBadge}</span>
       </motion.div>
 
       <motion.div
@@ -44,17 +49,20 @@ export function ProfileCard({
         />
 
         <div className="relative h-full w-full overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-slate-700 via-slate-800 to-slate-900">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(34,211,238,0.15)_0%,transparent_60%)]" />
-
-          {/* Portrait silhouette — replace with <Image src="/profile.jpg" /> when ready */}
-          <div className="absolute inset-x-0 bottom-0 flex justify-center">
-            <div className="relative h-[85%] w-[75%]">
-              <div className="absolute inset-0 rounded-t-[40%] bg-gradient-to-b from-slate-600/80 to-slate-700/40" />
-              <div className="absolute left-1/2 top-[12%] h-[28%] w-[42%] -translate-x-1/2 rounded-full bg-gradient-to-b from-slate-500 to-slate-600" />
-              <div className="absolute left-1/2 top-[38%] h-[62%] w-[80%] -translate-x-1/2 rounded-t-[45%] bg-gradient-to-b from-slate-600/90 to-slate-800/60" />
-            </div>
-          </div>
-
+          {photoUrl ? (
+            <Image src={photoUrl} alt={name} fill className="object-cover object-top" sizes="280px" priority />
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(34,211,238,0.15)_0%,transparent_60%)]" />
+              <div className="absolute inset-x-0 bottom-0 flex justify-center">
+                <div className="relative h-[85%] w-[75%]">
+                  <div className="absolute inset-0 rounded-t-[40%] bg-gradient-to-b from-slate-600/80 to-slate-700/40" />
+                  <div className="absolute left-1/2 top-[12%] h-[28%] w-[42%] -translate-x-1/2 rounded-full bg-gradient-to-b from-slate-500 to-slate-600" />
+                  <div className="absolute left-1/2 top-[38%] h-[62%] w-[80%] -translate-x-1/2 rounded-t-[45%] bg-gradient-to-b from-slate-600/90 to-slate-800/60" />
+                </div>
+              </div>
+            </>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-cyan-500/5" />
         </div>
       </motion.div>
