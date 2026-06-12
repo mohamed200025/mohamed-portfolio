@@ -33,6 +33,8 @@ export interface ProjectRecord {
   primary_button_external: boolean;
   secondary_button_label: string;
   secondary_button_href: string;
+  website_url?: string | null;
+  details_url?: string | null;
   featured: boolean;
   accent: "cyan" | "blue";
   showcase_type: "eduvera" | "muhlentechnik" | "custom";

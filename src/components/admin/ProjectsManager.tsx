@@ -19,6 +19,8 @@ const emptyProject = (): Partial<ProjectRecord> => ({
   primary_button_external: false,
   secondary_button_label: "Case Study",
   secondary_button_href: "#",
+  website_url: "",
+  details_url: "",
   featured: false,
   accent: "cyan",
   showcase_type: "custom",
@@ -80,6 +82,8 @@ export function ProjectsManager() {
       primary_button_external: selected.primary_button_external,
       secondary_button_label: selected.secondary_button_label,
       secondary_button_href: selected.secondary_button_href,
+      website_url: selected.website_url?.trim() || null,
+      details_url: selected.details_url?.trim() || null,
       featured: selected.featured,
       accent: selected.accent,
       showcase_type: selected.showcase_type,
@@ -209,6 +213,27 @@ export function ProjectsManager() {
               onChange={(e) => setSelected({ ...selected, technologies: e.target.value.split(",").map((t) => t.trim()).filter(Boolean) })}
             />
           </AdminFormField>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <AdminFormField label="Website URL">
+              <input
+                type="url"
+                className={adminInputClass}
+                value={selected.website_url ?? ""}
+                onChange={(e) => setSelected({ ...selected, website_url: e.target.value })}
+                placeholder="https://example.com"
+              />
+            </AdminFormField>
+            <AdminFormField label="Project Details URL">
+              <input
+                type="url"
+                className={adminInputClass}
+                value={selected.details_url ?? ""}
+                onChange={(e) => setSelected({ ...selected, details_url: e.target.value })}
+                placeholder="https://example.com/case-study"
+              />
+            </AdminFormField>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
             <AdminFormField label="Showcase Type">

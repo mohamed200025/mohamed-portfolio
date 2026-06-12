@@ -120,6 +120,8 @@ export const defaultProjects = staticProjects.map((p, i) => ({
   primary_button_external: p.primaryButton.external ?? false,
   secondary_button_label: p.secondaryButton.label,
   secondary_button_href: p.secondaryButton.href,
+  website_url: p.primaryButton.href === "#" ? "" : p.primaryButton.href,
+  details_url: p.secondaryButton.href === "#" ? "" : p.secondaryButton.href,
   featured: p.featured ?? false,
   accent: p.accent,
   showcase_type: p.id === "eduvera" ? "eduvera" as const : p.id === "muhlentechnik" ? "muhlentechnik" as const : "custom" as const,

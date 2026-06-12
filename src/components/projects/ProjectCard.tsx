@@ -21,6 +21,14 @@ interface ProjectCardProps {
   index: number;
 }
 
+function hasProjectUrl(url?: string | null): url is string {
+  return Boolean(url?.trim());
+}
+
+function isExternalUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url);
+}
+
 const accentStyles = {
   cyan: {
     badge: "border-cyan-500/30 bg-cyan-500/10 text-cyan-400",
@@ -46,6 +54,10 @@ export function ProjectCard({
 }: ProjectCardProps) {
   const styles = accentStyles[project.accent];
   const Icon = getIcon(project.icon_name);
+  const websiteUrl = project.website_url?.trim() ?? "";
+  const detailsUrl = project.details_url?.trim() ?? "";
+  const showWebsite = hasProjectUrl(websiteUrl);
+  const showDetails = hasProjectUrl(detailsUrl);
 
   return (
     <motion.article
@@ -136,31 +148,39 @@ export function ProjectCard({
             ))}
           </motion.div>
 
-          <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
-            <ShimmerButton>
-              <MagneticButton
-                href={project.primary_button_href}
-                variant="primary"
-                className="!px-5 !py-3"
-              >
-                {project.primary_button_label}
-                {project.primary_button_external ? (
-                  <ExternalLink className="h-4 w-4" />
-                ) : (
-                  <ArrowRight className="h-4 w-4" />
-                )}
-              </MagneticButton>
-            </ShimmerButton>
-            <MagneticButton
-              href={project.secondary_button_href}
-              variant="secondary"
-              className="!px-5 !py-3"
-            >
-              <FileText className="h-4 w-4" />
-              {project.secondary_button_label}
-              <ArrowUpRight className="h-3.5 w-3.5 opacity-50" />
-            </MagneticButton>
-          </motion.div>
+          {(showWebsite || showDetails) && (
+            <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
+              {showWebsite && (
+                <ShimmerButton>
+                  <MagneticButton
+                    href={websiteUrl}
+                    variant="primary"
+                    className="!px-5 !py-3"
+                    external={isExternalUrl(websiteUrl)}
+                  >
+                    Visit Website
+                    {isExternalUrl(websiteUrl) ? (
+                      <ExternalLink className="h-4 w-4" />
+                    ) : (
+                      <ArrowRight className="h-4 w-4" />
+                    )}
+                  </MagneticButton>
+                </ShimmerButton>
+              )}
+              {showDetails && (
+                <MagneticButton
+                  href={detailsUrl}
+                  variant="secondary"
+                  className="!px-5 !py-3"
+                  external={isExternalUrl(detailsUrl)}
+                >
+                  <FileText className="h-4 w-4" />
+                  Project Details
+                  <ArrowUpRight className="h-3.5 w-3.5 opacity-50" />
+                </MagneticButton>
+              )}
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Showcase */}

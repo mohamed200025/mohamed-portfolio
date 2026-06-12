@@ -37,6 +37,8 @@ create table if not exists projects (
   primary_button_external boolean not null default false,
   secondary_button_label text not null default 'Case Study',
   secondary_button_href text not null default '#',
+  website_url text,
+  details_url text,
   featured boolean not null default false,
   accent text not null default 'cyan' check (accent in ('cyan', 'blue')),
   showcase_type text not null default 'custom' check (showcase_type in ('eduvera', 'muhlentechnik', 'custom')),

@@ -9,6 +9,7 @@ interface MagneticButtonProps {
   className?: string;
   variant?: "primary" | "secondary";
   href?: string;
+  external?: boolean;
   onClick?: () => void;
 }
 
@@ -17,6 +18,7 @@ export function MagneticButton({
   className = "",
   variant = "primary",
   href,
+  external,
   onClick,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
@@ -55,7 +57,12 @@ export function MagneticButton({
 
   if (href) {
     return (
-      <motion.a ref={ref as React.RefObject<HTMLAnchorElement>} href={href} {...motionProps}>
+      <motion.a
+        ref={ref as React.RefObject<HTMLAnchorElement>}
+        href={href}
+        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        {...motionProps}
+      >
         <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400/0 via-white/10 to-violet-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         {children}
       </motion.a>
