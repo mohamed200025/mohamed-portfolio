@@ -14,6 +14,7 @@ import {
   defaultHero,
   defaultJourney,
   defaultProjects,
+  defaultApps,
   defaultSections,
   defaultSeo,
   fallbackPortfolioData,
@@ -29,6 +30,8 @@ import {
   normalizePricingTimeline,
 } from "./pricing-normalize";
 import { normalizeHeroSettings, resolveFeaturedProject } from "./hero-utils";
+import { resolveDownloadApp, sortApps } from "./apps";
+import { normalizeApp } from "./app-utils";
 import { projectStats } from "@/lib/projects-data";
 import { normalizeProject } from "./project-utils";
 import type {
@@ -78,6 +81,8 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
       cvRes,
       seoRes,
       sectionsRes,
+      appsRes,
+      appScreenshotsRes,
     ] = await Promise.all([
       supabase.from("hero_settings").select("*").eq("id", 1).maybeSingle(),
       supabase.from("about_settings").select("*").eq("id", 1).maybeSingle(),
@@ -95,6 +100,13 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
       supabase.from("cv_files").select("*").eq("is_active", true).maybeSingle(),
       supabase.from("seo_settings").select("*").eq("id", 1).maybeSingle(),
       supabase.from("section_content").select("*"),
+      supabase
+        .from("apps")
+        .select("*")
+        .eq("published", true)
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true }),
+      supabase.from("app_screenshots").select("*").order("sort_order"),
     ]);
 
     const projectsCount = projectsRes.data?.length ?? 0;
@@ -178,15 +190,36 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
         : defaultPricingData.timelineOptions)
     );
 
+    const shotsByApp = (appScreenshotsRes.data ?? []).reduce<Record<string, import("@/types/cms").AppScreenshot[]>>(
+      (acc, img) => {
+        if (!acc[img.app_id]) acc[img.app_id] = [];
+        acc[img.app_id]!.push(img);
+        return acc;
+      },
+      {}
+    );
+
+    const apps =
+      appsRes.data && appsRes.data.length > 0
+        ? sortApps(
+            appsRes.data.map((row) =>
+              normalizeApp(row as Record<string, unknown>, shotsByApp[row.id] ?? [])
+            )
+          )
+        : defaultApps;
+
     const hero = heroRes.data
       ? normalizeHeroSettings(heroRes.data as Record<string, unknown>)
       : defaultHero;
 
     const featuredProject = resolveFeaturedProject(hero, projects);
+    const downloadApp = resolveDownloadApp(hero, apps);
 
     return {
       hero,
       featuredProject,
+      downloadApp,
+      apps,
       about,
       aboutStatistics: aboutSettingsToStatistics(about),
       journey,

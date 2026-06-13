@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import type { ProjectImage, ProjectRecord } from "@/types/cms";
+import type { AppRecord, ProjectImage, ProjectRecord } from "@/types/cms";
 import {
   buildCaseStudyPayload,
   buildCoreProjectPayload,
@@ -57,6 +57,7 @@ const emptyProject = (): Partial<ProjectRecord> => ({
   results: [],
   challenges: [],
   solutions: [],
+  app_id: null,
   featured: false,
   accent: "cyan",
   showcase_type: "custom",
@@ -67,6 +68,7 @@ const emptyProject = (): Partial<ProjectRecord> => ({
 
 export function ProjectsManager() {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
+  const [apps, setApps] = useState<AppRecord[]>([]);
   const [selected, setSelected] = useState<ProjectRecord | null>(null);
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,8 +77,12 @@ export function ProjectsManager() {
 
   const loadProjects = async () => {
     const supabase = createClient();
-    const { data } = await supabase.from("projects").select("*").order("sort_order");
-    setProjects((data ?? []).map((row) => normalizeProject(row as Record<string, unknown>)));
+    const [projectsRes, appsRes] = await Promise.all([
+      supabase.from("projects").select("*").order("sort_order"),
+      supabase.from("apps").select("id, name").order("sort_order"),
+    ]);
+    setProjects((projectsRes.data ?? []).map((row) => normalizeProject(row as Record<string, unknown>)));
+    setApps((appsRes.data ?? []) as AppRecord[]);
     setLoading(false);
   };
 
@@ -435,6 +441,18 @@ export function ProjectsManager() {
               rows={3}
               value={(selected.gallery_images ?? []).join("\n")}
               onChange={(e) => setSelected({ ...selected, gallery_images: parseLinesInput(e.target.value) })}
+            />
+          </AdminFormField>
+
+          <AdminFormField label="Linked App Page (optional)">
+            <AdminSelect
+              value={selected.app_id ?? ""}
+              onChange={(app_id) => setSelected({ ...selected, app_id: app_id || null })}
+              options={[
+                { value: "", label: "None" },
+                ...apps.map((a) => ({ value: a.id, label: a.name })),
+              ]}
+              placeholder="None"
             />
           </AdminFormField>
 

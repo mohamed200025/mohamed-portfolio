@@ -15,6 +15,7 @@ import {
   Search,
   Sparkles,
   Star,
+  Smartphone,
   UserCircle,
   Route,
 } from "lucide-react";
@@ -25,6 +26,7 @@ const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/hero", label: "Hero", icon: Sparkles },
   { href: "/admin/projects", label: "Projects", icon: Briefcase },
+  { href: "/admin/apps", label: "Apps", icon: Smartphone },
   { href: "/admin/about", label: "About", icon: UserCircle },
   { href: "/admin/journey", label: "Journey", icon: Route },
   { href: "/admin/contact", label: "Contact", icon: Mail },

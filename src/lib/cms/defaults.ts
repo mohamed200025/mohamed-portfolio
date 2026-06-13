@@ -1,4 +1,4 @@
-import type { AboutSettings, ContactSettings, HeroSettings, JourneyEntry, PortfolioData, PricingCurrency, PricingData, PricingFeature, PricingProjectType, PricingSettings, PricingTimelineOption, SeoSettings } from "@/types/cms";
+import type { AboutSettings, AppRecord, ContactSettings, HeroSettings, JourneyEntry, PortfolioData, PricingCurrency, PricingData, PricingFeature, PricingProjectType, PricingSettings, PricingTimelineOption, SeoSettings } from "@/types/cms";
 import { buildPricingData } from "@/lib/cms/pricing-utils";
 import { aboutSettingsToStatistics } from "@/lib/cms/about-utils";
 import { contactSettingsToMethods } from "@/lib/cms/contact-utils";
@@ -34,6 +34,8 @@ export const defaultHero: HeroSettings = {
   profile_name: "Mohamed Ournani",
   profile_title: "Full Stack & Flutter Developer",
   featured_project_id: null,
+  download_app_enabled: false,
+  download_app_id: null,
 };
 
 export const defaultSeo: SeoSettings = {
@@ -271,6 +273,7 @@ export const defaultProjects = staticProjects.map((p, i) => ({
   icon_name: p.id === "eduvera" ? "BookOpen" : "Factory",
   sort_order: i,
   published: true,
+  app_id: null,
   images: [],
   gallery_images: [] as string[],
   challenges: (caseStudyDefaults[p.id]?.challenges as string[]) ?? [],
@@ -348,9 +351,13 @@ export const defaultPricingData: PricingData = buildPricingData(
   defaultPricingTimelines
 );
 
+export const defaultApps: AppRecord[] = [];
+
 export const fallbackPortfolioData: PortfolioData = {
   hero: defaultHero,
   featuredProject: defaultProjects[0] ?? null,
+  downloadApp: null,
+  apps: defaultApps,
   about: defaultAbout,
   aboutStatistics: defaultAboutStatistics,
   journey: defaultJourney,

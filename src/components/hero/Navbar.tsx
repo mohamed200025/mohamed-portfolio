@@ -6,15 +6,7 @@ import { Menu, X, Send } from "lucide-react";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { fadeIn } from "@/lib/animations";
 
-const navLinks = [
-  { label: "Home", href: "#home", active: true },
-  { label: "About", href: "#about" },
-  { label: "Projects", href: "#projects" },
-  { label: "Services", href: "#services" },
-  { label: "Technologies", href: "#technologies" },
-  { label: "Calculator", href: "#calculator" },
-  { label: "Contact", href: "#contact" },
-];
+import { homeNavLinks } from "@/lib/site-nav";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -30,7 +22,7 @@ export function Navbar() {
         <BrandLogo href="#home" />
 
         <nav className="hidden items-center gap-8 lg:flex">
-          {navLinks.map((link) => (
+          {homeNavLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
@@ -80,7 +72,7 @@ export function Navbar() {
             transition={{ duration: 0.3 }}
           >
             <nav className="flex flex-col gap-1 px-6 py-4">
-              {navLinks.map((link) => (
+              {homeNavLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { defaultHero } from "@/lib/cms/defaults";
 import { normalizeHeroSettings } from "@/lib/cms/hero-utils";
-import type { HeroSettings, ProjectRecord } from "@/types/cms";
+import type { AppRecord, HeroSettings, ProjectRecord } from "@/types/cms";
 import { AdminFormField, adminInputClass, adminTextareaClass } from "./AdminFormField";
 import { AdminSelect } from "./AdminSelect";
 import { Save } from "lucide-react";
@@ -12,6 +12,7 @@ import { Save } from "lucide-react";
 export function HeroEditor() {
   const [form, setForm] = useState<HeroSettings>(defaultHero);
   const [publishedProjects, setPublishedProjects] = useState<ProjectRecord[]>([]);
+  const [publishedApps, setPublishedApps] = useState<AppRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -19,15 +20,17 @@ export function HeroEditor() {
   useEffect(() => {
     const load = async () => {
       const supabase = createClient();
-      const [heroRes, projectsRes] = await Promise.all([
+      const [heroRes, projectsRes, appsRes] = await Promise.all([
         supabase.from("hero_settings").select("*").eq("id", 1).maybeSingle(),
         supabase.from("projects").select("id, title, category").eq("published", true).order("sort_order"),
+        supabase.from("apps").select("id, name").eq("published", true).order("sort_order"),
       ]);
 
       if (heroRes.data) {
         setForm(normalizeHeroSettings(heroRes.data as Record<string, unknown>));
       }
       setPublishedProjects((projectsRes.data ?? []) as ProjectRecord[]);
+      setPublishedApps((appsRes.data ?? []) as AppRecord[]);
       setLoading(false);
     };
     load();
@@ -53,6 +56,8 @@ export function HeroEditor() {
       profile_name: form.profile_name,
       profile_title: form.profile_title,
       featured_project_id: form.featured_project_id || null,
+      download_app_enabled: form.download_app_enabled,
+      download_app_id: form.download_app_enabled ? form.download_app_id || null : null,
       updated_at: new Date().toISOString(),
     });
 
@@ -65,10 +70,46 @@ export function HeroEditor() {
     label: project.title,
   }));
 
+  const appOptions = publishedApps.map((app) => ({
+    value: app.id,
+    label: app.name,
+  }));
+
   if (loading) return <p className="text-white/50">Loading...</p>;
 
   return (
     <div className="max-w-3xl space-y-8">
+      <div>
+        <h3 className="mb-4 border-b border-white/10 pb-2 text-sm font-semibold uppercase tracking-wider text-cyan-400">
+          Download App CTA
+        </h3>
+        <p className="mb-4 text-sm text-white/45">
+          Optionally show a &quot;Download App&quot; button in the hero that links to the selected app product page.
+        </p>
+        <label className="mb-4 flex items-center gap-2 text-sm text-white/70">
+          <input
+            type="checkbox"
+            checked={form.download_app_enabled}
+            onChange={(e) => setForm({ ...form, download_app_enabled: e.target.checked })}
+          />
+          Show Download App button in Hero
+        </label>
+        {form.download_app_enabled && (
+          <AdminFormField label="Featured App">
+            {appOptions.length === 0 ? (
+              <p className="text-sm text-amber-400/90">No published apps yet. Create one in Apps admin.</p>
+            ) : (
+              <AdminSelect
+                value={form.download_app_id ?? publishedApps[0]?.id ?? ""}
+                onChange={(download_app_id) => setForm({ ...form, download_app_id })}
+                options={appOptions}
+                placeholder="Select an app"
+              />
+            )}
+          </AdminFormField>
+        )}
+      </div>
+
       <div>
         <h3 className="mb-4 border-b border-white/10 pb-2 text-sm font-semibold uppercase tracking-wider text-cyan-400">
           Featured Showcase Project

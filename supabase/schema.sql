@@ -21,6 +21,8 @@ create table if not exists hero_settings (
   profile_name text not null default 'Mohamed Ournani',
   profile_title text not null default 'Full Stack & Flutter Developer',
   featured_project_id uuid references projects(id) on delete set null,
+  download_app_enabled boolean not null default false,
+  download_app_id uuid,
   updated_at timestamptz not null default now()
 );
 
@@ -61,6 +63,7 @@ create table if not exists projects (
   icon_name text not null default 'BookOpen',
   sort_order int not null default 0,
   published boolean not null default true,
+  app_id uuid,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -75,6 +78,49 @@ create table if not exists project_images (
   is_cover boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+-- ─── Apps (App Store) ───────────────────────────────────────────────────────
+create table if not exists apps (
+  id uuid primary key default uuid_generate_v4(),
+  slug text unique not null,
+  name text not null,
+  short_description text not null default '',
+  description text not null default '',
+  logo_url text,
+  logo_storage_path text,
+  apk_url text,
+  apk_storage_path text,
+  play_store_url text,
+  version text not null default '1.0.0',
+  file_size text not null default '',
+  last_updated text not null default '',
+  downloads_count int not null default 0,
+  technologies jsonb not null default '[]',
+  features jsonb not null default '[]',
+  rating numeric(2,1) not null default 4.5 check (rating >= 0 and rating <= 5),
+  sort_order int not null default 0,
+  published boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists app_screenshots (
+  id uuid primary key default uuid_generate_v4(),
+  app_id uuid not null references apps(id) on delete cascade,
+  url text not null,
+  storage_path text,
+  alt_text text,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table hero_settings
+  add constraint hero_settings_download_app_id_fkey
+  foreign key (download_app_id) references apps(id) on delete set null;
+
+alter table projects
+  add constraint projects_app_id_fkey
+  foreign key (app_id) references apps(id) on delete set null;
 
 -- ─── About ──────────────────────────────────────────────────────────────────
 create table if not exists about_settings (
@@ -279,6 +325,7 @@ insert into storage.buckets (id, name, public) values ('project-images', 'projec
 insert into storage.buckets (id, name, public) values ('cv-files', 'cv-files', true) on conflict do nothing;
 insert into storage.buckets (id, name, public) values ('uploads', 'uploads', true) on conflict do nothing;
 insert into storage.buckets (id, name, public) values ('profile-photos', 'profile-photos', true) on conflict do nothing;
+insert into storage.buckets (id, name, public) values ('app-assets', 'app-assets', true) on conflict do nothing;
 
 -- ─── RLS ────────────────────────────────────────────────────────────────────
 alter table hero_settings enable row level security;
@@ -300,6 +347,8 @@ alter table seo_settings enable row level security;
 alter table page_analytics enable row level security;
 alter table about_settings enable row level security;
 alter table journey_entries enable row level security;
+alter table apps enable row level security;
+alter table app_screenshots enable row level security;
 
 -- Public read for published content
 create policy "Public read hero" on hero_settings for select using (true);
@@ -318,6 +367,8 @@ create policy "Public read active cv" on cv_files for select using (is_active = 
 create policy "Public read seo" on seo_settings for select using (true);
 create policy "Public read about" on about_settings for select using (true);
 create policy "Public read published journey" on journey_entries for select using (published = true);
+create policy "Public read published apps" on apps for select using (published = true);
+create policy "Public read app screenshots" on app_screenshots for select using (true);
 
 -- Anyone can submit contact + analytics
 create policy "Public insert contact messages" on contact_messages for insert with check (true);
@@ -348,6 +399,8 @@ create policy "Admin all seo" on seo_settings for all using (auth.role() = 'auth
 create policy "Admin read analytics" on page_analytics for select using (auth.role() = 'authenticated');
 create policy "Admin all about" on about_settings for all using (auth.role() = 'authenticated');
 create policy "Admin all journey" on journey_entries for all using (auth.role() = 'authenticated');
+create policy "Admin all apps" on apps for all using (auth.role() = 'authenticated');
+create policy "Admin all app screenshots" on app_screenshots for all using (auth.role() = 'authenticated');
 
 -- Storage policies
 create policy "Public read project images storage" on storage.objects for select using (bucket_id = 'project-images');
@@ -357,6 +410,20 @@ create policy "Admin upload cv" on storage.objects for insert with check (bucket
 create policy "Admin delete storage" on storage.objects for delete using (auth.role() = 'authenticated');
 create policy "Public read profile photos storage" on storage.objects for select using (bucket_id = 'profile-photos');
 create policy "Admin upload profile photos" on storage.objects for insert with check (bucket_id = 'profile-photos' and auth.role() = 'authenticated');
+create policy "Public read app assets storage" on storage.objects for select using (bucket_id = 'app-assets');
+create policy "Admin upload app assets" on storage.objects for insert with check (bucket_id = 'app-assets' and auth.role() = 'authenticated');
+
+create or replace function increment_app_downloads(app_slug text)
+returns void
+language plpgsql
+security definer
+as $$
+begin
+  update apps set downloads_count = downloads_count + 1 where slug = app_slug and published = true;
+end;
+$$;
+
+grant execute on function increment_app_downloads(text) to anon, authenticated;
 
 -- ─── Seed default content ───────────────────────────────────────────────────
 insert into hero_settings (description) values (

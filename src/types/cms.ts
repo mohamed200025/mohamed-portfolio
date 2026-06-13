@@ -13,6 +13,8 @@ export interface HeroSettings {
   profile_name: string;
   profile_title: string;
   featured_project_id: string | null;
+  download_app_enabled: boolean;
+  download_app_id: string | null;
 }
 
 export interface TechStackItem {
@@ -69,6 +71,7 @@ export interface ProjectRecord {
   icon_name: string;
   sort_order: number;
   published: boolean;
+  app_id?: string | null;
   images?: ProjectImage[];
 }
 
@@ -80,6 +83,39 @@ export interface ProjectImage {
   alt_text?: string | null;
   sort_order: number;
   is_cover: boolean;
+}
+
+export interface AppScreenshot {
+  id: string;
+  app_id: string;
+  url: string;
+  storage_path?: string | null;
+  alt_text?: string | null;
+  sort_order: number;
+}
+
+export interface AppRecord {
+  id: string;
+  slug: string;
+  name: string;
+  short_description: string;
+  description: string;
+  logo_url?: string | null;
+  logo_storage_path?: string | null;
+  apk_url?: string | null;
+  apk_storage_path?: string | null;
+  play_store_url?: string | null;
+  version: string;
+  file_size: string;
+  last_updated: string;
+  downloads_count: number;
+  technologies: string[];
+  features: string[];
+  rating: number;
+  sort_order: number;
+  published: boolean;
+  created_at?: string;
+  screenshots?: AppScreenshot[];
 }
 
 export interface Testimonial {
@@ -292,6 +328,8 @@ export interface PricingLead {
 export interface PortfolioData {
   hero: HeroSettings;
   featuredProject: ProjectRecord | null;
+  downloadApp: AppRecord | null;
+  apps: AppRecord[];
   about: AboutSettings;
   aboutStatistics: AboutStatistic[];
   journey: JourneyEntry[];

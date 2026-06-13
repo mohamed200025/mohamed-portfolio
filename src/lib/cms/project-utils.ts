@@ -139,6 +139,7 @@ export function buildCoreProjectPayload(project: ProjectRecord) {
     secondary_button_href: project.secondary_button_href,
     website_url: websiteUrl || null,
     details_url: project.details_url?.trim() || null,
+    app_id: project.app_id?.trim() || null,
     featured: project.featured,
     accent: project.accent,
     showcase_type: project.showcase_type,

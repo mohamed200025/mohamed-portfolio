@@ -1,14 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Briefcase, MessageCircle } from "lucide-react";
+import { Briefcase, Download, MessageCircle } from "lucide-react";
 import { MagneticButton, ShimmerButton } from "@/components/ui/MagneticButton";
 import { TechStack } from "./TechStack";
 import { staggerContainer, fadeUp } from "@/lib/animations";
-import type { HeroSettings } from "@/types/cms";
+import type { AppRecord, HeroSettings } from "@/types/cms";
+import { appDetailsPath } from "@/lib/cms/app-utils";
 import { defaultHero } from "@/lib/cms/defaults";
 
-export function HeroContent({ hero = defaultHero }: { hero?: HeroSettings }) {
+export function HeroContent({
+  hero = defaultHero,
+  downloadApp,
+}: {
+  hero?: HeroSettings;
+  downloadApp?: AppRecord | null;
+}) {
   return (
     <motion.div
       className="flex flex-col items-start"
@@ -62,6 +69,12 @@ export function HeroContent({ hero = defaultHero }: { hero?: HeroSettings }) {
           <MessageCircle className="h-4 w-4" />
           {hero.secondary_cta_text}
         </MagneticButton>
+        {downloadApp && (
+          <MagneticButton href={appDetailsPath(downloadApp.slug)} variant="secondary">
+            <Download className="h-4 w-4" />
+            Download App
+          </MagneticButton>
+        )}
       </motion.div>
 
       <motion.div variants={fadeUp}>

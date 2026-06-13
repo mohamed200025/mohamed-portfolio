@@ -16,11 +16,12 @@ export function PortfolioClient({ data }: { data: PortfolioData }) {
     <>
       <AnalyticsTracker />
       <main className="bg-black">
-        <Hero hero={data.hero} featuredProject={data.featuredProject} />
+        <Hero hero={data.hero} featuredProject={data.featuredProject} downloadApp={data.downloadApp} />
         <ProjectsSection
           projects={data.projects}
           projectStats={data.projectStats}
           header={data.sections.projects_header}
+          apps={data.apps}
         />
         {data.testimonials.length > 0 && (
           <TestimonialsSection testimonials={data.testimonials} />

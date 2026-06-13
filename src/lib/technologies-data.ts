@@ -138,6 +138,7 @@ export const contactMethods = [
 export const footerLinks = [
   { label: "Home", href: "#home" },
   { label: "Projects", href: "#projects" },
+  { label: "Apps", href: "/apps" },
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   { label: "Technologies", href: "#technologies" },

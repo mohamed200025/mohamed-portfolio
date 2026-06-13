@@ -6,19 +6,21 @@ import { SectionBackground } from "./SectionBackground";
 import { SectionHeader } from "./SectionHeader";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectShowcase } from "./ProjectShowcase";
-import type { ProjectRecord } from "@/types/cms";
+import type { AppRecord, ProjectRecord } from "@/types/cms";
 import { defaultSections } from "@/lib/cms/defaults";
 
 interface ProjectsSectionProps {
   projects: ProjectRecord[];
   projectStats: { label: string; icon: string }[];
   header?: Record<string, unknown>;
+  apps?: AppRecord[];
 }
 
 export function ProjectsSection({
   projects,
   projectStats,
   header = defaultSections.projects_header,
+  apps = [],
 }: ProjectsSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -49,6 +51,7 @@ export function ProjectsSection({
               index={index}
               reversed={index % 2 === 1}
               showcase={<ProjectShowcase project={project} priority={index === 0} />}
+              linkedApp={apps.find((a) => a.id === project.app_id) ?? null}
             />
           ))}
         </div>

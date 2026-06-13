@@ -21,6 +21,8 @@ export function normalizeHeroSettings(row: Record<string, unknown>): HeroSetting
     profile_name: String(row.profile_name ?? defaultHero.profile_name),
     profile_title: String(row.profile_title ?? defaultHero.profile_title),
     featured_project_id: row.featured_project_id ? String(row.featured_project_id) : null,
+    download_app_enabled: Boolean(row.download_app_enabled ?? false),
+    download_app_id: row.download_app_id ? String(row.download_app_id) : null,
   };
 }
 

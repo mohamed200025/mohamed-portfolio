@@ -4,13 +4,15 @@ import { motion } from "framer-motion";
 import {
   ArrowUpRight,
   Check,
+  Download,
   ExternalLink,
   FileText,
   Star,
 } from "lucide-react";
 import { MagneticButton, ShimmerButton } from "@/components/ui/MagneticButton";
 import { fadeUp } from "@/lib/animations";
-import type { ProjectRecord } from "@/types/cms";
+import type { AppRecord, ProjectRecord } from "@/types/cms";
+import { appDetailsPath } from "@/lib/cms/app-utils";
 import { getIcon } from "@/lib/icons";
 import { getWebsiteUrl, projectDetailsPath } from "@/lib/cms/project-utils";
 
@@ -19,6 +21,7 @@ interface ProjectCardProps {
   reversed?: boolean;
   showcase: React.ReactNode;
   index: number;
+  linkedApp?: AppRecord | null;
 }
 
 const accentStyles = {
@@ -43,6 +46,7 @@ export function ProjectCard({
   reversed = false,
   showcase,
   index,
+  linkedApp,
 }: ProjectCardProps) {
   const styles = accentStyles[project.accent];
   const Icon = getIcon(project.icon_name);
@@ -165,6 +169,16 @@ export function ProjectCard({
               Project Details
               <ArrowUpRight className="h-3.5 w-3.5 opacity-50" />
             </MagneticButton>
+            {linkedApp && (
+              <MagneticButton
+                href={appDetailsPath(linkedApp.slug)}
+                variant="secondary"
+                className="w-full !px-5 !py-3 sm:w-auto"
+              >
+                <Download className="h-4 w-4" />
+                Download App
+              </MagneticButton>
+            )}
           </motion.div>
         </motion.div>
 

@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Download,
   ExternalLink,
   Grid3X3,
   Play,
@@ -24,9 +25,10 @@ import {
 import { useCallback, useMemo, useState } from "react";
 import type { ProjectPageData } from "@/lib/cms/projects";
 import { getWebsiteUrl, hasUrl, isExternalUrl } from "@/lib/cms/project-utils";
+import { appDetailsPath } from "@/lib/cms/app-utils";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { ProjectShowcase } from "@/components/projects/ProjectShowcase";
-import { ProjectPageNav } from "./ProjectPageNav";
+import { SitePageNav } from "@/components/layout/SitePageNav";
 import { getStatIcon } from "./stat-icons";
 import { MagneticButton, ShimmerButton } from "@/components/ui/MagneticButton";
 
@@ -42,7 +44,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 export function ProjectDetailsPage({ data }: { data: ProjectPageData }) {
-  const { project, prev, next } = data;
+  const { project, linkedApp, prev, next } = data;
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [galleryPage, setGalleryPage] = useState(0);
 
@@ -79,7 +81,7 @@ export function ProjectDetailsPage({ data }: { data: ProjectPageData }) {
 
   return (
     <div className="min-h-screen bg-[#050508] text-white">
-      <ProjectPageNav />
+      <SitePageNav active="projects" />
 
       <main className="pt-24">
         {/* Hero */}
@@ -147,6 +149,16 @@ export function ProjectDetailsPage({ data }: { data: ProjectPageData }) {
                     >
                       <Play className="h-4 w-4" />
                       Live Demo
+                    </MagneticButton>
+                  )}
+                  {linkedApp && (
+                    <MagneticButton
+                      href={appDetailsPath(linkedApp.slug)}
+                      variant="secondary"
+                      className="!px-6 !py-3.5"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download App
                     </MagneticButton>
                   )}
                 </motion.div>

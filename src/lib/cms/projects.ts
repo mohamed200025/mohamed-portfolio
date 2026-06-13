@@ -1,10 +1,12 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import type { ProjectRecord } from "@/types/cms";
+import type { AppRecord, ProjectRecord } from "@/types/cms";
 import { defaultProjects } from "./defaults";
+import { fetchAllPublishedApps, resolveProjectApp } from "./apps";
 import { normalizeProject } from "./project-utils";
 
 export interface ProjectPageData {
   project: ProjectRecord;
+  linkedApp: AppRecord | null;
   prev: { slug: string; title: string } | null;
   next: { slug: string; title: string } | null;
 }
@@ -56,19 +58,34 @@ export async function fetchProjectBySlug(slug: string): Promise<ProjectPageData 
     const projects = defaultProjects;
     const project = projects.find((p) => p.slug === slug);
     if (!project) return null;
-    return { project, ...adjacentProjects(projects, slug) };
+    return {
+      project,
+      linkedApp: resolveProjectApp(project, []),
+      ...adjacentProjects(projects, slug),
+    };
   }
 
   try {
-    const projects = await fetchAllPublishedProjects();
+    const [projects, apps] = await Promise.all([
+      fetchAllPublishedProjects(),
+      fetchAllPublishedApps(),
+    ]);
     const project = projects.find((p) => p.slug === slug);
     if (!project) return null;
-    return { project, ...adjacentProjects(projects, slug) };
+    return {
+      project,
+      linkedApp: resolveProjectApp(project, apps),
+      ...adjacentProjects(projects, slug),
+    };
   } catch {
     const projects = defaultProjects;
     const project = projects.find((p) => p.slug === slug);
     if (!project) return null;
-    return { project, ...adjacentProjects(projects, slug) };
+    return {
+      project,
+      linkedApp: resolveProjectApp(project, []),
+      ...adjacentProjects(projects, slug),
+    };
   }
 }
 
