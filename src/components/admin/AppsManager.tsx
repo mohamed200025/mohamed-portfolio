@@ -167,7 +167,7 @@ export function AppsManager() {
   if (loading) return <p className="text-white/50">Loading apps...</p>;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
       <div className="space-y-2">
         {apps.map((app) => (
           <button
@@ -190,8 +190,8 @@ export function AppsManager() {
       </div>
 
       {selected ? (
-        <div className="space-y-6 rounded-xl border border-white/10 bg-white/[0.02] p-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-6 rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:p-6 min-w-0">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="App Name">
               <input className={adminInputClass} value={selected.name} onChange={(e) => setSelected({ ...selected, name: e.target.value })} />
             </AdminFormField>
@@ -208,7 +208,7 @@ export function AppsManager() {
             <textarea className={adminTextareaClass} rows={4} value={selected.description} onChange={(e) => setSelected({ ...selected, description: e.target.value })} />
           </AdminFormField>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <AdminFormField label="Version">
               <input className={adminInputClass} value={selected.version} onChange={(e) => setSelected({ ...selected, version: e.target.value })} />
             </AdminFormField>
@@ -231,7 +231,7 @@ export function AppsManager() {
             <textarea className={adminTextareaClass} rows={4} value={selected.features.join("\n")} onChange={(e) => setSelected({ ...selected, features: parseLinesList(e.target.value) })} />
           </AdminFormField>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Play Store URL">
               <input className={adminInputClass} value={selected.play_store_url ?? ""} onChange={(e) => setSelected({ ...selected, play_store_url: e.target.value })} placeholder="https://play.google.com/..." />
             </AdminFormField>
@@ -240,7 +240,7 @@ export function AppsManager() {
             </AdminFormField>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <p className="mb-2 text-xs font-medium text-white/60">App Logo</p>
               {selected.logo_url && (
@@ -300,17 +300,17 @@ export function AppsManager() {
             <input type="number" className={`${adminInputClass} w-24`} value={selected.sort_order} onChange={(e) => setSelected({ ...selected, sort_order: Number(e.target.value) })} title="Sort order" />
           </div>
 
-          <div className="flex gap-3 border-t border-white/10 pt-4">
+          <div className="flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row">
             <button
               onClick={handleSave}
               disabled={saving || apkUploading}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-5 py-2.5 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-5 py-2.5 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               <Save className="h-4 w-4" />
               {apkUploading ? "Upload in progress…" : saving ? "Saving..." : "Save App"}
             </button>
             {selected.id && !selected.id.startsWith("new-") && (
-              <button onClick={() => handleDelete(selected.id)} className="inline-flex items-center gap-2 rounded-xl border border-red-500/30 px-5 py-2.5 text-sm text-red-400">
+              <button onClick={() => handleDelete(selected.id)} className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/30 px-5 py-2.5 text-sm text-red-400 sm:w-auto">
                 <Trash2 className="h-4 w-4" /> Delete
               </button>
             )}

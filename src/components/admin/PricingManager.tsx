@@ -30,7 +30,7 @@ const thClass = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wi
 const tdClass = "px-4 py-3 align-middle";
 const tableClass = "w-full min-w-[640px] border-collapse text-sm";
 const cardClass = "rounded-xl border border-white/10 bg-white/[0.02]";
-const tableCardClass = "overflow-x-auto rounded-xl border border-white/10 bg-white/[0.02]";
+const tableCardClass = "w-full min-w-0 overflow-x-auto rounded-xl border border-white/10 bg-white/[0.02]";
 
 export function PricingManager() {
   const [settings, setSettings] = useState<PricingSettings>(defaultPricingData.settings);
@@ -352,7 +352,7 @@ export function PricingManager() {
   if (loading) return <p className="text-white/50">Loading pricing CMS...</p>;
 
   return (
-    <div className="max-w-6xl space-y-10 pb-12">
+    <div className="min-w-0 w-full max-w-full space-y-10 pb-12">
       {(error || needsSeed) && (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
           <p className="text-sm text-amber-200">
@@ -373,7 +373,7 @@ export function PricingManager() {
 
       {/* ── Section Header ── */}
       <AdminSection title="Section Header">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <AdminFormField label="Badge">
             <input className={adminInputClass} value={settings.badge} onChange={(e) => setSettings({ ...settings, badge: e.target.value })} />
           </AdminFormField>
@@ -495,7 +495,7 @@ export function PricingManager() {
           ) : (
             projectTypes.map((item, index) => (
               <div key={item.id} className={`${cardClass} p-5`}>
-                <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <AdminFormField label="Title">
                     <input className={adminInputClass} value={item.title} onChange={(e) => { const n = [...projectTypes]; n[index] = { ...item, title: e.target.value }; setProjectTypes(n); }} placeholder="Landing Page" />
                   </AdminFormField>
@@ -524,12 +524,12 @@ export function PricingManager() {
                     <input type="number" className={adminInputClass} value={item.sort_order} onChange={(e) => { const n = [...projectTypes]; n[index] = { ...item, sort_order: Number(e.target.value) }; setProjectTypes(n); }} />
                   </AdminFormField>
                 </div>
-                <div className="flex items-center justify-between border-t border-white/5 pt-4">
+                <div className="flex flex-col gap-3 border-t border-white/5 pt-4 sm:flex-row sm:items-center sm:justify-between">
                   <label className="flex items-center gap-2 text-sm text-white/60">
                     <input type="checkbox" checked={item.published} onChange={(e) => { const n = [...projectTypes]; n[index] = { ...item, published: e.target.checked }; setProjectTypes(n); }} />
                     Published on calculator
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <ActionButton onClick={() => saveProjectType(item)} disabled={saving} label="Save" small />
                     <button type="button" onClick={() => deleteRow("pricing_project_types", item.id, item.title)} className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10">
                       <Trash2 className="h-3.5 w-3.5" /> Delete

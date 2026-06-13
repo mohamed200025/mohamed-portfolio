@@ -125,7 +125,7 @@ export function AboutEditor() {
               {uploadingPhoto ? "Uploading..." : "Upload Profile Photo"}
               <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
             </label>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <AdminFormField label="Name">
                 <input className={adminInputClass} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </AdminFormField>
@@ -146,7 +146,7 @@ export function AboutEditor() {
           <AdminFormField label="Short Bio (subtitle)">
             <textarea className={adminTextareaClass} rows={3} value={form.short_bio} onChange={(e) => setForm({ ...form, short_bio: e.target.value })} />
           </AdminFormField>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <AdminFormField label="Badge">
               <input className={adminInputClass} value={form.section_badge} onChange={(e) => setForm({ ...form, section_badge: e.target.value })} />
             </AdminFormField>
@@ -179,7 +179,7 @@ export function AboutEditor() {
 
       <div>
         <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-cyan-400">Statistics</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
             { label: "Projects Completed", valueKey: "stat_projects_value", suffixKey: "stat_projects_suffix", tagKey: "stat_projects_tag" },
             { label: "Technologies", valueKey: "stat_technologies_value", suffixKey: "stat_technologies_suffix", tagKey: "stat_technologies_tag" },

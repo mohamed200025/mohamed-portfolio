@@ -41,7 +41,7 @@ export function LeadsManager() {
       ) : (
         leads.map((lead) => (
           <div key={lead.id} className={`rounded-xl border p-4 ${lead.read ? "border-white/5 bg-white/[0.02]" : "border-cyan-500/20 bg-cyan-500/5"}`}>
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-white">{lead.name}</p>

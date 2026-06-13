@@ -6,7 +6,7 @@ export function AdminFormField({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="min-w-0 w-full">
       <label className="mb-1.5 block text-xs font-medium text-white/60">{label}</label>
       {children}
     </div>

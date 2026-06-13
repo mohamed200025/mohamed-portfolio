@@ -50,12 +50,12 @@ export function TestimonialsManager() {
   if (loading) return <p className="text-white/50">Loading...</p>;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div className="space-y-3">
         {items.map((t) => (
           <div key={t.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <div className="flex items-start justify-between">
-              <div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
                 <p className="font-medium text-white">{t.name}</p>
                 <p className="text-xs text-white/40">{t.role} {t.company && `· ${t.company}`}</p>
                 <p className="mt-2 text-sm text-white/60">{t.content}</p>
@@ -79,7 +79,7 @@ export function TestimonialsManager() {
         <label className="flex items-center gap-2 text-sm text-white/70">
           <input type="checkbox" checked={form.published ?? true} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Published
         </label>
-        <button onClick={save} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-5 py-2.5 text-sm text-white">
+        <button onClick={save} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-5 py-2.5 text-sm text-white sm:w-auto">
           <Save className="h-4 w-4" /> Save
         </button>
         {!form.id && (

@@ -140,7 +140,7 @@ export function HeroEditor() {
             <input className={adminInputClass} value={form.status_badge} onChange={(e) => setForm({ ...form, status_badge: e.target.value })} />
           </AdminFormField>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Headline Prefix">
               <input className={adminInputClass} value={form.headline_prefix} onChange={(e) => setForm({ ...form, headline_prefix: e.target.value })} />
             </AdminFormField>
@@ -149,7 +149,7 @@ export function HeroEditor() {
             </AdminFormField>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Subheadline Prefix">
               <input className={adminInputClass} value={form.subheadline_prefix} onChange={(e) => setForm({ ...form, subheadline_prefix: e.target.value })} />
             </AdminFormField>
@@ -162,7 +162,7 @@ export function HeroEditor() {
             <textarea className={adminTextareaClass} rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </AdminFormField>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Primary CTA Text">
               <input className={adminInputClass} value={form.primary_cta_text} onChange={(e) => setForm({ ...form, primary_cta_text: e.target.value })} />
             </AdminFormField>
@@ -177,7 +177,7 @@ export function HeroEditor() {
             </AdminFormField>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Profile Name">
               <input className={adminInputClass} value={form.profile_name} onChange={(e) => setForm({ ...form, profile_name: e.target.value })} />
             </AdminFormField>

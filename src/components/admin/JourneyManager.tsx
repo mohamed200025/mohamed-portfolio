@@ -67,7 +67,7 @@ export function JourneyManager() {
   if (loading) return <p className="text-white/50">Loading...</p>;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div className="space-y-3">
         {items.map((entry) => (
           <div key={entry.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
@@ -102,7 +102,7 @@ export function JourneyManager() {
 
       <div className="space-y-4 rounded-xl border border-white/10 bg-white/[0.03] p-6">
         <h3 className="font-medium text-white">{form.id ? "Edit Entry" : "New Entry"}</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <AdminFormField label="Year">
             <input className={adminInputClass} value={form.year ?? ""} onChange={(e) => setForm({ ...form, year: e.target.value })} />
           </AdminFormField>

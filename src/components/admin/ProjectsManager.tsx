@@ -257,7 +257,7 @@ export function ProjectsManager() {
   if (loading) return <p className="text-white/50">Loading projects...</p>;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
       <div className="space-y-2">
         <button
           onClick={() => selectProject({ ...emptyProject(), id: `new-${Date.now()}` } as ProjectRecord)}
@@ -283,7 +283,7 @@ export function ProjectsManager() {
 
       {selected ? (
         <div className="space-y-4 rounded-xl border border-white/10 bg-white/[0.03] p-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Title">
               <input className={adminInputClass} value={selected.title} onChange={(e) => setSelected({ ...selected, title: e.target.value })} />
             </AdminFormField>
@@ -321,7 +321,7 @@ export function ProjectsManager() {
           <p className="text-xs text-white/40">
             Project Details opens at /projects/[slug] automatically. Set Website URL and optional Live Demo below.
           </p>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Website URL">
               <input
                 type="url"
@@ -353,7 +353,7 @@ export function ProjectsManager() {
             />
           </AdminFormField>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Problem Statement">
               <textarea
                 className={adminTextareaClass}
@@ -381,7 +381,7 @@ export function ProjectsManager() {
             />
           </AdminFormField>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <AdminFormField label="Client Name">
               <input className={adminInputClass} value={selected.client_name ?? ""} onChange={(e) => setSelected({ ...selected, client_name: e.target.value })} />
             </AdminFormField>
@@ -416,7 +416,7 @@ export function ProjectsManager() {
             />
           </AdminFormField>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminFormField label="Challenges (one per line)">
               <textarea
                 className={adminTextareaClass}
@@ -456,7 +456,7 @@ export function ProjectsManager() {
             />
           </AdminFormField>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <AdminFormField label="Showcase Type">
               <AdminSelect
                 value={selected.showcase_type}
@@ -517,8 +517,8 @@ export function ProjectsManager() {
             </div>
           )}
 
-          <div className="flex gap-3">
-            <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-5 py-2.5 text-sm font-medium text-white disabled:opacity-50">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <button onClick={handleSave} disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-5 py-2.5 text-sm font-medium text-white disabled:opacity-50 sm:w-auto">
               <Save className="h-4 w-4" />
               {saving ? "Saving..." : "Save"}
             </button>

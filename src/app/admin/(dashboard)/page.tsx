@@ -23,7 +23,7 @@ export default async function AdminDashboardPage() {
         </p>
       </div>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
         <StatCard label="Total Projects" value={stats.totalProjects} icon={Briefcase} />
         <StatCard
           label="Unread Messages"
@@ -54,8 +54,8 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 lg:col-span-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-6 lg:col-span-2">
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-cyan-400" />
             <h2 className="font-semibold text-white">Page Views</h2>
@@ -63,7 +63,7 @@ export default async function AdminDashboardPage() {
           <ViewsChart data={stats.viewsByDay} />
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
+        <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-6">
           <h2 className="mb-4 font-semibold text-white">Top Pages</h2>
           {stats.topPages.length === 0 ? (
             <p className="text-sm text-white/40">No data yet</p>

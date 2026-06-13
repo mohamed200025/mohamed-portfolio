@@ -24,7 +24,8 @@ export function ViewsChart({ data }: ViewsChartProps) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
+    <div className="min-w-0 w-full overflow-hidden">
+      <ResponsiveContainer width="100%" height={260} minWidth={0}>
       <AreaChart data={data}>
         <defs>
           <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
@@ -51,6 +52,7 @@ export function ViewsChart({ data }: ViewsChartProps) {
           strokeWidth={2}
         />
       </AreaChart>
-    </ResponsiveContainer>
+      </ResponsiveContainer>
+    </div>
   );
 }

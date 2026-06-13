@@ -75,7 +75,7 @@ export function ContactEditor() {
 
       <div>
         <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-cyan-400">Contact Methods</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <AdminFormField label="WhatsApp Number">
             <input
               className={adminInputClass}
