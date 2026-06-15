@@ -368,11 +368,9 @@ export interface AnalyticsVisit {
   visitor_id: string;
   country: string | null;
   city: string | null;
-  device_type: string;
-  browser: string | null;
   referrer: string | null;
   user_agent: string | null;
-  timezone: string | null;
+  session_id: string | null;
 }
 
 export interface AnalyticsTimelineRow {

@@ -36,6 +36,12 @@ const emptyAnalytics: AnalyticsData = {
   },
 };
 
+function deviceFromUserAgent(userAgent: string | null): string {
+  if (!userAgent) return "Desktop";
+  const match = userAgent.match(/device=([^;]+)/i);
+  return match?.[1]?.trim() ?? "Desktop";
+}
+
 export async function fetchAnalyticsData(
   range: AnalyticsRange = "30d"
 ): Promise<AnalyticsData> {
@@ -46,11 +52,16 @@ export async function fetchAnalyticsData(
     const { data, error } = await supabase
       .from("analytics_visits")
       .select(
-        "id, created_at, page_path, visitor_id, country, city, device_type, browser, referrer, user_agent, timezone"
+        "id, created_at, page_path, visitor_id, country, city, referrer, user_agent, session_id"
       )
       .order("created_at", { ascending: false });
 
-    if (error || !data) return emptyAnalytics;
+    if (error || !data) {
+      if (error) {
+        console.error("[analytics] fetchAnalyticsData read failed:", error.message, error.code);
+      }
+      return emptyAnalytics;
+    }
 
     const visits = data as AnalyticsVisit[];
     const now = new Date();
@@ -63,7 +74,7 @@ export async function fetchAnalyticsData(
       pagePath: visit.page_path,
       referrer: visit.referrer,
       country: visit.country,
-      deviceType: visit.device_type,
+      deviceType: deviceFromUserAgent(visit.user_agent),
     }));
 
     return {

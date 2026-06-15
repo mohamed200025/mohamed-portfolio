@@ -67,7 +67,16 @@ export function AnalyticsTracker() {
         deviceType: detectDeviceType(),
         timezone,
       }),
-    }).catch(() => {});
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const payload = await res.json().catch(() => ({}));
+          console.error("[analytics] track failed:", res.status, payload);
+        }
+      })
+      .catch((err) => {
+        console.error("[analytics] network error:", err);
+      });
   }, [pathname]);
 
   return null;
