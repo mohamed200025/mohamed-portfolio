@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "migrate:pricing": "node scripts/apply-pricing-migration.mjs"
+    "migrate:pricing": "node scripts/apply-pricing-migration.mjs",
+    "generate:favicons": "node scripts/generate-favicons.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

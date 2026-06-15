@@ -7,6 +7,7 @@ export interface AppPageData {
   app: AppRecord;
   prev: { slug: string; name: string } | null;
   next: { slug: string; name: string } | null;
+  relatedApps: AppRecord[];
 }
 
 export function sortApps(apps: AppRecord[]): AppRecord[] {
@@ -68,7 +69,11 @@ export async function fetchAppBySlug(slug: string): Promise<AppPageData | null> 
   const apps = await fetchAllPublishedApps();
   const app = apps.find((a) => a.slug === slug);
   if (!app) return null;
-  return { app, ...adjacentApps(apps, slug) };
+  return {
+    app,
+    ...adjacentApps(apps, slug),
+    relatedApps: apps.filter((a) => a.slug !== slug),
+  };
 }
 
 export async function fetchAllAppSlugs(): Promise<string[]> {

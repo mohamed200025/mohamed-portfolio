@@ -19,6 +19,18 @@ import { formatDownloads } from "@/lib/cms/app-utils";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { SitePageNav } from "@/components/layout/SitePageNav";
 import { MagneticButton, ShimmerButton } from "@/components/ui/MagneticButton";
+import { MobileAppStorePage } from "./MobileAppStorePage";
+
+interface DeveloperInfo {
+  name: string;
+  title: string;
+  photoUrl?: string | null;
+}
+
+interface AppStorePageProps {
+  data: AppPageData;
+  developer: DeveloperInfo;
+}
 
 function StarRating({ rating, className = "" }: { rating: number; className?: string }) {
   return (
@@ -34,7 +46,7 @@ function StarRating({ rating, className = "" }: { rating: number; className?: st
   );
 }
 
-export function AppStorePage({ data }: { data: AppPageData }) {
+export function AppStorePage({ data, developer }: AppStorePageProps) {
   const { app, prev, next } = data;
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -59,7 +71,10 @@ export function AppStorePage({ data }: { data: AppPageData }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white">
+    <>
+      <MobileAppStorePage data={data} developer={developer} />
+
+      <div className="hidden min-h-screen bg-[#050508] text-white lg:block">
       <SitePageNav active="apps" />
 
       <main className="pt-24">
@@ -290,6 +305,7 @@ export function AppStorePage({ data }: { data: AppPageData }) {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

@@ -29,7 +29,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function AppPage({ params }: PageProps) {
   const { slug } = await params;
-  const data = await fetchAppBySlug(slug);
+  const [data, portfolio] = await Promise.all([fetchAppBySlug(slug), fetchPortfolioData()]);
   if (!data) notFound();
-  return <AppStorePage data={data} />;
+
+  const developer = {
+    name: portfolio.about.name || portfolio.hero.profile_name || "Mohamed Ournani",
+    title: portfolio.about.job_title || portfolio.hero.profile_title || "Full Stack & Flutter Developer",
+    photoUrl: portfolio.about.profile_photo_url,
+  };
+
+  return <AppStorePage data={data} developer={developer} />;
 }

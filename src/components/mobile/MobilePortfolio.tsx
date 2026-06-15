@@ -15,17 +15,13 @@ import { MobileContactPanel } from "./MobileContactPanel";
 import { MobileTermsSheet } from "./MobileTermsSheet";
 import { MobileWhatsAppFab } from "./MobileWhatsAppFab";
 
-const sectionTitles: Record<Exclude<MobileNavTab, "home">, string> = {
-  projects: "Web Projects",
+const sectionTitles: Record<"technologies" | "contact", string> = {
   technologies: "Technologies",
-  services: "Services",
   contact: "Contact",
 };
 
-const sectionSubtitles: Record<Exclude<MobileNavTab, "home">, string> = {
-  projects: "Full-stack & web applications",
+const sectionSubtitles: Record<"technologies" | "contact", string> = {
   technologies: "Stack & tools I work with",
-  services: "What I can build for you",
   contact: "Let's start a conversation",
 };
 
@@ -35,6 +31,7 @@ interface MobilePortfolioProps {
 
 export function MobilePortfolio({ data }: MobilePortfolioProps) {
   const [navTab, setNavTab] = useState<MobileNavTab>("home");
+  const [activeSegment, setActiveSegment] = useState<MobileSegment>("apps");
   const [termsOpen, setTermsOpen] = useState(false);
 
   const publishedApps = useMemo(
@@ -63,7 +60,15 @@ export function MobilePortfolio({ data }: MobilePortfolioProps) {
 
   const handleNavChange = (tab: MobileNavTab) => {
     setTermsOpen(false);
-    setNavTab(tab);
+    if (tab === "projects") {
+      setNavTab("home");
+      setActiveSegment("projects");
+    } else if (tab === "home") {
+      setNavTab("home");
+      setActiveSegment("apps");
+    } else {
+      setNavTab(tab);
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -71,14 +76,16 @@ export function MobilePortfolio({ data }: MobilePortfolioProps) {
     setTermsOpen((open) => !open);
   };
 
-  const activeSegment: MobileSegment =
-    navTab === "projects" ? "projects" : navTab === "services" ? "services" : "apps";
-
   const handleSegmentChange = (segment: MobileSegment) => {
-    if (segment === "apps") handleNavChange("home");
-    else if (segment === "projects") handleNavChange("projects");
-    else handleNavChange("services");
+    setActiveSegment(segment);
   };
+
+  const bottomNavActive: MobileNavTab =
+    navTab === "home"
+      ? activeSegment === "projects"
+        ? "projects"
+        : "home"
+      : navTab;
 
   return (
     <div className="relative min-h-[100dvh] bg-[#030306] text-white lg:hidden">
@@ -89,39 +96,63 @@ export function MobilePortfolio({ data }: MobilePortfolioProps) {
       </div>
 
       <div className="relative mx-auto min-h-[100dvh] max-w-lg pb-[calc(80px+env(safe-area-inset-bottom))]">
-        <AnimatePresence mode="wait">
-          {navTab === "home" ? (
-            <motion.div
-              key="home"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <MobileProfileHeader
-                name={profileName}
-                title={profileTitle}
-                bio={profileBio}
-                photoUrl={profilePhoto}
-                cvUrl={cvUrl}
-              />
+        {navTab === "home" ? (
+          <>
+            <MobileProfileHeader
+              name={profileName}
+              title={profileTitle}
+              bio={profileBio}
+              photoUrl={profilePhoto}
+              cvUrl={cvUrl}
+            />
 
-              <MobileSegmentTabs active={activeSegment} onChange={handleSegmentChange} />
+            <MobileSegmentTabs active={activeSegment} onChange={handleSegmentChange} />
 
-              <MobileHorizontalCarousel
-                id="mobile-apps"
-                className="mt-2"
-                title="Featured Apps"
-                subtitle="Mobile applications I've built"
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSegment}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
               >
-                {publishedApps.length > 0 ? (
-                  publishedApps.map((app) => <MobileAppShowcaseCard key={app.id} app={app} />)
-                ) : (
-                  <MobileCarouselEmpty message="No apps published yet." />
+                {activeSegment === "apps" && (
+                  <MobileHorizontalCarousel
+                    id="mobile-apps"
+                    className="mt-2"
+                    title="Featured Apps"
+                    subtitle="Mobile applications I've built"
+                  >
+                    {publishedApps.length > 0 ? (
+                      publishedApps.map((app) => <MobileAppShowcaseCard key={app.id} app={app} />)
+                    ) : (
+                      <MobileCarouselEmpty message="No apps published yet." />
+                    )}
+                  </MobileHorizontalCarousel>
                 )}
-              </MobileHorizontalCarousel>
-            </motion.div>
-          ) : (
+
+                {activeSegment === "projects" && (
+                  <div className="mt-2 flex flex-col gap-3 px-5 pb-6">
+                    {publishedProjects.length > 0 ? (
+                      publishedProjects.map((project) => (
+                        <MobileProjectShowcaseCard key={project.id} project={project} fullWidth />
+                      ))
+                    ) : (
+                      <MobileCarouselEmpty message="No projects published yet." />
+                    )}
+                  </div>
+                )}
+
+                {activeSegment === "services" && (
+                  <div className="mt-2">
+                    <MobileServicesPanel services={data.sections.services} embedded />
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </>
+        ) : navTab === "technologies" || navTab === "contact" ? (
+          <AnimatePresence mode="wait">
             <motion.div
               key={navTab}
               initial={{ opacity: 0, y: 10 }}
@@ -135,23 +166,8 @@ export function MobilePortfolio({ data }: MobilePortfolioProps) {
                 <p className="mt-1 text-[13px] text-white/40">{sectionSubtitles[navTab]}</p>
               </header>
 
-              {navTab === "projects" && (
-                <div className="flex flex-col gap-3 px-5 pb-6">
-                  {publishedProjects.length > 0 ? (
-                    publishedProjects.map((project) => (
-                      <MobileProjectShowcaseCard key={project.id} project={project} fullWidth />
-                    ))
-                  ) : (
-                    <MobileCarouselEmpty message="No projects published yet." />
-                  )}
-                </div>
-              )}
-
               {navTab === "technologies" && (
                 <MobileTechnologiesPanel technologies={data.sections.technologies} />
-              )}
-              {navTab === "services" && (
-                <MobileServicesPanel services={data.sections.services} />
               )}
               {navTab === "contact" && (
                 <MobileContactPanel
@@ -160,12 +176,12 @@ export function MobilePortfolio({ data }: MobilePortfolioProps) {
                 />
               )}
             </motion.div>
-          )}
-        </AnimatePresence>
+          </AnimatePresence>
+        ) : null}
       </div>
 
       <MobileBottomNav
-        active={navTab}
+        active={bottomNavActive}
         termsOpen={termsOpen}
         onChange={handleNavChange}
         onTermsClick={handleTermsClick}
