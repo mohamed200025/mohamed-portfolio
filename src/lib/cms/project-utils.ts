@@ -121,6 +121,14 @@ export function parseLinesInput(raw: string): string[] {
     .filter(Boolean);
 }
 
+/** Full project row for insert/update — requires case study columns in DB. */
+export function buildProjectPayload(project: ProjectRecord) {
+  return {
+    ...buildCoreProjectPayload(project),
+    ...buildCaseStudyPayload(project),
+  };
+}
+
 /** Columns present after base schema + URL migration — always safe to write. */
 export function buildCoreProjectPayload(project: ProjectRecord) {
   const websiteUrl = readUrlField(project.website_url);

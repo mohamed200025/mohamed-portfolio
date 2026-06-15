@@ -5,8 +5,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { AppRecord, ProjectImage, ProjectRecord } from "@/types/cms";
 import {
-  buildCaseStudyPayload,
-  buildCoreProjectPayload,
+  buildProjectPayload,
   formatResultsInput,
   formatStatisticsInput,
   isMissingColumnError,
@@ -112,42 +111,48 @@ export function ProjectsManager() {
     setSaving(true);
     setMessage("");
     const supabase = createClient();
-    const corePayload = buildCoreProjectPayload(selected);
-    const caseStudyPayload = buildCaseStudyPayload(selected);
+    const payload = buildProjectPayload(selected);
 
-    const persistCaseStudy = async (projectId: string) => {
-      const { error } = await supabase
-        .from("projects")
-        .update(caseStudyPayload)
-        .eq("id", projectId);
+    const refreshSavedProject = async (projectId: string) => {
+      const [projectRes, imagesRes] = await Promise.all([
+        supabase.from("projects").select("*").eq("id", projectId).maybeSingle(),
+        supabase.from("project_images").select("*").eq("project_id", projectId).order("sort_order"),
+      ]);
 
-      if (!error) return null;
-      if (isMissingColumnError(error)) {
-        return "Project links saved. Run supabase/migrations/20250612_project_case_study_fields.sql to enable case study fields.";
+      if (projectRes.error) {
+        setMessage(projectRes.error.message);
+        return false;
       }
-      return `Project links saved. Case study fields failed: ${error.message}`;
+
+      if (!projectRes.data) {
+        setMessage("Save succeeded but the project could not be reloaded. Refresh the page.");
+        return false;
+      }
+
+      const normalized = normalizeProject(
+        projectRes.data as Record<string, unknown>,
+        imagesRes.data ?? []
+      );
+      selectProject(normalized);
+      await loadProjects();
+      return true;
     };
 
     if (selected.id && !selected.id.startsWith("new-")) {
-      console.info("[ProjectsManager] save update", {
-        projectId: selected.id,
-        payload: corePayload,
-      });
-
       const { data: savedRows, error } = await supabase
         .from("projects")
-        .update(corePayload)
+        .update(payload)
         .eq("id", selected.id)
         .select("*");
 
-      console.info("[ProjectsManager] save update result", {
-        projectId: selected.id,
-        rowCount: savedRows?.length ?? 0,
-        error: error?.message ?? null,
-      });
-
-      if (error && !isSingleRowCoercionError(error)) {
-        setMessage(error.message);
+      if (error) {
+        if (isMissingColumnError(error)) {
+          setMessage(
+            "Case study columns are missing in Supabase. Run supabase/migrations/20250612_project_case_study_fields.sql in the SQL Editor, then save again."
+          );
+        } else if (!isSingleRowCoercionError(error)) {
+          setMessage(error.message);
+        }
         setSaving(false);
         return;
       }
@@ -163,47 +168,36 @@ export function ProjectsManager() {
         return;
       }
 
-      const caseStudyMessage = await persistCaseStudy(selected.id);
-      const normalized = normalizeProject(saved);
-      selectProject(normalized);
-      await loadProjects();
-      setMessage(caseStudyMessage ?? "Project updated!");
+      const reloaded = await refreshSavedProject(selected.id);
+      if (reloaded) setMessage("Project updated!");
     } else {
-      console.info("[ProjectsManager] save insert", {
-        projectId: selected.id,
-        payload: corePayload,
-      });
-
       const { data: createdRows, error } = await supabase
         .from("projects")
-        .insert(corePayload)
+        .insert(payload)
         .select("*");
 
-      console.info("[ProjectsManager] save insert result", {
-        projectId: selected.id,
-        rowCount: createdRows?.length ?? 0,
-        error: error?.message ?? null,
-      });
-
-      if (error && !isSingleRowCoercionError(error)) {
-        setMessage(error.message);
+      if (error) {
+        if (isMissingColumnError(error)) {
+          setMessage(
+            "Case study columns are missing in Supabase. Run supabase/migrations/20250612_project_case_study_fields.sql in the SQL Editor, then save again."
+          );
+        } else if (!isSingleRowCoercionError(error)) {
+          setMessage(error.message);
+        }
         setSaving(false);
         return;
       }
 
       const created = pickSavedProjectRow(createdRows as Record<string, unknown>[] | null);
 
-      if (!created) {
+      if (!created?.id) {
         setMessage("Create failed — no row returned.");
         setSaving(false);
         return;
       }
 
-      const caseStudyMessage = await persistCaseStudy(created.id as string);
-      const normalized = normalizeProject(created);
-      selectProject(normalized);
-      await loadProjects();
-      setMessage(caseStudyMessage ?? "Project created!");
+      const reloaded = await refreshSavedProject(created.id as string);
+      if (reloaded) setMessage("Project created!");
     }
     setSaving(false);
   };

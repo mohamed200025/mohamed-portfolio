@@ -10,12 +10,14 @@ import { ContactSection } from "@/components/contact/ContactSection";
 import { CalculatorSection } from "@/components/calculator/CalculatorSection";
 import { TestimonialsSection } from "@/components/testimonials/TestimonialsSection";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+import { MobilePortfolio } from "@/components/mobile/MobilePortfolio";
 
 export function PortfolioClient({ data }: { data: PortfolioData }) {
   return (
     <>
       <AnalyticsTracker />
-      <main className="bg-black">
+      <MobilePortfolio data={data} />
+      <main className="hidden bg-black lg:block">
         <Hero hero={data.hero} featuredProject={data.featuredProject} downloadApp={data.downloadApp} />
         <ProjectsSection
           projects={data.projects}
