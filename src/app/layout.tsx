@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { fetchPortfolioData } from "@/lib/cms/fetch";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import "./globals.css";
 
 const inter = Inter({
@@ -39,7 +40,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full bg-black font-sans">{children}</body>
+      <body className="min-h-full bg-black font-sans">
+        <AnalyticsTracker />
+        {children}
+      </body>
     </html>
   );
 }

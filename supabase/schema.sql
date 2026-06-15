@@ -320,6 +320,24 @@ create table if not exists page_analytics (
   created_at timestamptz not null default now()
 );
 
+create table if not exists analytics_visits (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamptz not null default now(),
+  page_path text not null default '/',
+  visitor_id text not null,
+  country text,
+  city text,
+  device_type text not null default 'Desktop',
+  browser text,
+  referrer text,
+  user_agent text,
+  timezone text
+);
+
+create index if not exists analytics_visits_created_at_idx on analytics_visits (created_at desc);
+create index if not exists analytics_visits_visitor_id_idx on analytics_visits (visitor_id);
+create index if not exists analytics_visits_page_path_idx on analytics_visits (page_path);
+
 -- ─── Storage buckets ────────────────────────────────────────────────────────
 insert into storage.buckets (id, name, public) values ('project-images', 'project-images', true) on conflict do nothing;
 insert into storage.buckets (id, name, public) values ('cv-files', 'cv-files', true) on conflict do nothing;
@@ -345,6 +363,7 @@ alter table pricing_leads enable row level security;
 alter table cv_files enable row level security;
 alter table seo_settings enable row level security;
 alter table page_analytics enable row level security;
+alter table analytics_visits enable row level security;
 alter table about_settings enable row level security;
 alter table journey_entries enable row level security;
 alter table apps enable row level security;
@@ -374,6 +393,7 @@ create policy "Public read app screenshots" on app_screenshots for select using 
 create policy "Public insert contact messages" on contact_messages for insert with check (true);
 create policy "Public insert pricing leads" on pricing_leads for insert with check (true);
 create policy "Public insert analytics" on page_analytics for insert with check (true);
+create policy "Public insert analytics visits" on analytics_visits for insert with check (true);
 
 -- Authenticated admin full access
 create policy "Admin all hero" on hero_settings for all using (auth.role() = 'authenticated');
@@ -397,6 +417,7 @@ create policy "Admin delete messages" on contact_messages for delete using (auth
 create policy "Admin all cv" on cv_files for all using (auth.role() = 'authenticated');
 create policy "Admin all seo" on seo_settings for all using (auth.role() = 'authenticated');
 create policy "Admin read analytics" on page_analytics for select using (auth.role() = 'authenticated');
+create policy "Admin read analytics visits" on analytics_visits for select using (auth.role() = 'authenticated');
 create policy "Admin all about" on about_settings for all using (auth.role() = 'authenticated');
 create policy "Admin all journey" on journey_entries for all using (auth.role() = 'authenticated');
 create policy "Admin all apps" on apps for all using (auth.role() = 'authenticated');

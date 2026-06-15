@@ -1,4 +1,5 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { fetchVisitCountsForDashboard } from "@/lib/analytics/fetch";
 import type {
   DashboardStats,
   PortfolioData,
@@ -261,45 +262,17 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
 
   try {
     const supabase = await createClient();
-    const now = new Date();
-    const thirtyDaysAgo = new Date(now);
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const todayStart = new Date(now);
-    todayStart.setHours(0, 0, 0, 0);
 
-    const [projects, messages, leads, testimonials, analytics] = await Promise.all([
+    const [projects, messages, leads, testimonials, visitStats] = await Promise.all([
       supabase.from("projects").select("id, published"),
       supabase.from("contact_messages").select("id, read, created_at"),
       supabase.from("pricing_leads").select("id, read"),
       supabase.from("testimonials").select("id"),
-      supabase
-        .from("page_analytics")
-        .select("path, created_at")
-        .gte("created_at", thirtyDaysAgo.toISOString()),
+      fetchVisitCountsForDashboard(),
     ]);
 
     const allMessages = messages.data ?? [];
     const allLeads = leads.data ?? [];
-    const views = analytics.data ?? [];
-
-    const pageCounts: Record<string, number> = {};
-    const dayCounts: Record<string, number> = {};
-
-    views.forEach((v) => {
-      pageCounts[v.path] = (pageCounts[v.path] ?? 0) + 1;
-      const day = v.created_at.slice(0, 10);
-      dayCounts[day] = (dayCounts[day] ?? 0) + 1;
-    });
-
-    const topPages = Object.entries(pageCounts)
-      .map(([path, count]) => ({ path, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-
-    const viewsByDay = Object.entries(dayCounts)
-      .map(([date, views]) => ({ date, views }))
-      .sort((a, b) => a.date.localeCompare(b.date));
-
     const allProjects = projects.data ?? [];
 
     return {
@@ -310,10 +283,10 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
       unreadLeads: allLeads.filter((l) => !l.read).length,
       totalLeads: allLeads.length,
       testimonials: testimonials.data?.length ?? 0,
-      pageViews30d: views.length,
-      pageViewsToday: views.filter((v) => v.created_at >= todayStart.toISOString()).length,
-      topPages,
-      viewsByDay,
+      pageViews30d: visitStats.pageViews30d,
+      pageViewsToday: visitStats.pageViewsToday,
+      topPages: visitStats.topPages,
+      viewsByDay: visitStats.viewsByDay,
     };
   } catch {
     return empty;

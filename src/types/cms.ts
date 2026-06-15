@@ -358,3 +358,55 @@ export interface DashboardStats {
   topPages: { path: string; count: number }[];
   viewsByDay: { date: string; views: number }[];
 }
+
+export type AnalyticsRange = "today" | "7d" | "30d" | "12mo" | "all";
+
+export interface AnalyticsVisit {
+  id: string;
+  created_at: string;
+  page_path: string;
+  visitor_id: string;
+  country: string | null;
+  city: string | null;
+  device_type: string;
+  browser: string | null;
+  referrer: string | null;
+  user_agent: string | null;
+  timezone: string | null;
+}
+
+export interface AnalyticsTimelineRow {
+  id: string;
+  visitDate: string;
+  visitTime: string;
+  pagePath: string;
+  referrer: string | null;
+  country: string | null;
+  deviceType: string;
+}
+
+export interface AnalyticsChartPoint {
+  label: string;
+  visits: number;
+}
+
+export interface PeakTraffic {
+  mostActiveHour: string;
+  mostActiveDay: string;
+  mostActiveMonth: string;
+}
+
+export interface AnalyticsData {
+  visitorsToday: number;
+  visitorsThisWeek: number;
+  visitorsThisMonth: number;
+  visitorsThisYear: number;
+  totalVisitors: number;
+  timeline: AnalyticsTimelineRow[];
+  visitsByHour: AnalyticsChartPoint[];
+  visitsByDay: AnalyticsChartPoint[];
+  visitsByWeek: AnalyticsChartPoint[];
+  visitsByMonth: AnalyticsChartPoint[];
+  visitsByYear: AnalyticsChartPoint[];
+  peakTraffic: PeakTraffic;
+}
