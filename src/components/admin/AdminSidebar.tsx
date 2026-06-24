@@ -33,6 +33,7 @@ const links = [
   { href: "/admin/contact", label: "Contact", icon: Mail },
   { href: "/admin/pricing", label: "Pricing", icon: Calculator },
   { href: "/admin/leads", label: "Leads", icon: BarChart3 },
+  { href: "/admin/proposals", label: "Quote Requests", icon: FileText },
   { href: "/admin/testimonials", label: "Testimonials", icon: Star },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
   { href: "/admin/cv", label: "CV Uploads", icon: FileText },

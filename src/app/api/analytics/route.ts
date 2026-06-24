@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
 import {
   getCityFromHeaders,
   getCountryFromHeaders,
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
     const browser = parseBrowser(userAgent);
     const visitorId = body.visitorId ?? body.sessionId ?? "anonymous";
 
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     // Production table may not include device_type, browser, timezone yet.
     // Insert only columns confirmed in the live schema; enrich user_agent for now.

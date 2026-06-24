@@ -1,4 +1,6 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { unwrapList } from "@/lib/cms/query-utils";
+import { createPublicClient } from "@/lib/supabase/public";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type { AppRecord, ProjectRecord } from "@/types/cms";
 import { defaultProjects } from "./defaults";
 import { fetchAllPublishedApps, resolveProjectApp } from "./apps";
@@ -9,6 +11,11 @@ export interface ProjectPageData {
   linkedApp: AppRecord | null;
   prev: { slug: string; title: string } | null;
   next: { slug: string; title: string } | null;
+}
+
+function logDiagnostics(context: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV === "production" && !process.env.CMS_FETCH_DEBUG) return;
+  console.error(`[fetchProject] ${context}`, details);
 }
 
 function sortProjects(projects: ProjectRecord[]): ProjectRecord[] {
@@ -31,26 +38,38 @@ function adjacentProjects(
 }
 
 async function fetchAllPublishedProjects(): Promise<ProjectRecord[]> {
-  const supabase = await createClient();
-  const [projectsRes, imagesRes] = await Promise.all([
-    supabase.from("projects").select("*").eq("published", true).order("sort_order"),
-    supabase.from("project_images").select("*").order("sort_order"),
-  ]);
+  if (!isSupabaseConfigured()) return defaultProjects;
 
-  const imagesByProject = (imagesRes.data ?? []).reduce<Record<string, ProjectRecord["images"]>>(
-    (acc, img) => {
-      if (!acc[img.project_id]) acc[img.project_id] = [];
-      acc[img.project_id]!.push(img);
-      return acc;
-    },
-    {}
-  );
+  try {
+    const supabase = createPublicClient();
+    const [projectsRes, imagesRes] = await Promise.all([
+      supabase.from("projects").select("*").eq("published", true).order("sort_order"),
+      supabase.from("project_images").select("*").order("sort_order"),
+    ]);
 
-  if (!projectsRes.data?.length) return defaultProjects;
+    const projectRows = unwrapList(
+      projectsRes,
+      defaultProjects,
+      "projects",
+      logDiagnostics
+    );
+    const imageRows = unwrapList(imagesRes, [], "project_images", logDiagnostics, false);
 
-  return projectsRes.data.map((p) =>
-    normalizeProject(p as Record<string, unknown>, imagesByProject[p.id] ?? [])
-  );
+    const imagesByProject = imageRows.reduce<Record<string, ProjectRecord["images"]>>(
+      (acc, img) => {
+        if (!acc[img.project_id]) acc[img.project_id] = [];
+        acc[img.project_id]!.push(img);
+        return acc;
+      },
+      {}
+    );
+
+    return projectRows.map((p) =>
+      normalizeProject(p as Record<string, unknown>, imagesByProject[p.id] ?? [])
+    );
+  } catch {
+    return defaultProjects;
+  }
 }
 
 export async function fetchProjectBySlug(slug: string): Promise<ProjectPageData | null> {
@@ -94,13 +113,17 @@ export async function fetchAllProjectSlugs(): Promise<string[]> {
     return defaultProjects.map((p) => p.slug);
   }
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
       .from("projects")
       .select("slug")
       .eq("published", true)
       .order("sort_order");
-    return data?.length ? data.map((p) => p.slug) : defaultProjects.map((p) => p.slug);
+
+    if (error || !data?.length) {
+      return defaultProjects.map((p) => p.slug);
+    }
+    return data.map((p) => p.slug);
   } catch {
     return defaultProjects.map((p) => p.slug);
   }

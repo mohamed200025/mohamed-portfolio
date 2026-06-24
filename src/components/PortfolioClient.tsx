@@ -7,13 +7,14 @@ import { AboutSection } from "@/components/about/AboutSection";
 import { ServicesSection } from "@/components/services/ServicesSection";
 import { TechnologiesSection } from "@/components/technologies/TechnologiesSection";
 import { ContactSection } from "@/components/contact/ContactSection";
-import { CalculatorSection } from "@/components/calculator/CalculatorSection";
+import { PricingSection } from "@/components/pricing/PricingSection";
 import { TestimonialsSection } from "@/components/testimonials/TestimonialsSection";
 import { MobilePortfolio } from "@/components/mobile/MobilePortfolio";
+import { PricingConfigProvider } from "@/components/pricing/PricingConfigProvider";
 
 export function PortfolioClient({ data }: { data: PortfolioData }) {
   return (
-    <>
+    <PricingConfigProvider>
       <MobilePortfolio data={data} />
       <main className="hidden bg-black lg:block">
         <Hero hero={data.hero} featuredProject={data.featuredProject} downloadApp={data.downloadApp} />
@@ -34,7 +35,7 @@ export function PortfolioClient({ data }: { data: PortfolioData }) {
         />
         <ServicesSection services={data.sections.services} />
         <TechnologiesSection technologies={data.sections.technologies} />
-        <CalculatorSection data={data.pricingData} />
+        <PricingSection />
         <ContactSection
           contactSettings={data.contactSettings}
           contact={data.sections.contact}
@@ -42,6 +43,6 @@ export function PortfolioClient({ data }: { data: PortfolioData }) {
           footer={data.sections.footer}
         />
       </main>
-    </>
+    </PricingConfigProvider>
   );
 }

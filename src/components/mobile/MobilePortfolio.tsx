@@ -10,18 +10,17 @@ import { MobileAppShowcaseCard } from "./MobileAppShowcaseCard";
 import { MobileProjectShowcaseCard } from "./MobileProjectShowcaseCard";
 import { MobileBottomNav, type MobileNavTab } from "./MobileBottomNav";
 import { MobileServicesPanel } from "./MobileServicesPanel";
-import { MobileTechnologiesPanel } from "./MobileTechnologiesPanel";
+import { MobilePricingFlow } from "@/components/pricing/MobilePricingFlow";
+import { PricingConfigGate } from "@/components/pricing/PricingConfigGate";
 import { MobileContactPanel } from "./MobileContactPanel";
 import { MobileTermsSheet } from "./MobileTermsSheet";
 import { MobileWhatsAppFab } from "./MobileWhatsAppFab";
 
-const sectionTitles: Record<"technologies" | "contact", string> = {
-  technologies: "Technologies",
+const sectionTitles: Record<"contact", string> = {
   contact: "Contact",
 };
 
-const sectionSubtitles: Record<"technologies" | "contact", string> = {
-  technologies: "Stack & tools I work with",
+const sectionSubtitles: Record<"contact", string> = {
   contact: "Let's start a conversation",
 };
 
@@ -151,7 +150,21 @@ export function MobilePortfolio({ data }: MobilePortfolioProps) {
               </motion.div>
             </AnimatePresence>
           </>
-        ) : navTab === "technologies" || navTab === "contact" ? (
+        ) : navTab === "pricing" ? (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key="pricing"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <PricingConfigGate>
+                <MobilePricingFlow />
+              </PricingConfigGate>
+            </motion.div>
+          </AnimatePresence>
+        ) : navTab === "contact" ? (
           <AnimatePresence mode="wait">
             <motion.div
               key={navTab}
@@ -162,19 +175,14 @@ export function MobilePortfolio({ data }: MobilePortfolioProps) {
               className="pt-[max(1rem,env(safe-area-inset-top))]"
             >
               <header className="px-5 pb-4 pt-4">
-                <h1 className="text-xl font-bold text-white">{sectionTitles[navTab]}</h1>
-                <p className="mt-1 text-[13px] text-white/40">{sectionSubtitles[navTab]}</p>
+                <h1 className="text-xl font-bold text-white">{sectionTitles.contact}</h1>
+                <p className="mt-1 text-[13px] text-white/40">{sectionSubtitles.contact}</p>
               </header>
 
-              {navTab === "technologies" && (
-                <MobileTechnologiesPanel technologies={data.sections.technologies} />
-              )}
-              {navTab === "contact" && (
-                <MobileContactPanel
-                  contactSettings={data.contactSettings}
-                  contactMethods={data.contactMethods}
-                />
-              )}
+              <MobileContactPanel
+                contactSettings={data.contactSettings}
+                contactMethods={data.contactMethods}
+              />
             </motion.div>
           </AnimatePresence>
         ) : null}
@@ -188,7 +196,7 @@ export function MobilePortfolio({ data }: MobilePortfolioProps) {
       />
       <MobileTermsSheet open={termsOpen} onClose={() => setTermsOpen(false)} />
       {whatsappHref && (
-        <MobileWhatsAppFab href={whatsappHref} hidden={termsOpen} />
+        <MobileWhatsAppFab href={whatsappHref} hidden={termsOpen || navTab === "pricing"} />
       )}
     </div>
   );

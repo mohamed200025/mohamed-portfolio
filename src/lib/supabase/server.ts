@@ -1,7 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-export async function createClient() {
+/**
+ * Cookie-backed Supabase client for authenticated admin/server routes only.
+ * Do not use for public portfolio CMS reads — use createPublicClient() instead.
+ */
+export async function createAuthClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -24,6 +28,11 @@ export async function createClient() {
       },
     }
   );
+}
+
+/** @deprecated Prefer createAuthClient (admin) or createPublicClient (public CMS). */
+export async function createClient() {
+  return createAuthClient();
 }
 
 export function isSupabaseConfigured() {

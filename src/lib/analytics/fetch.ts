@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createAuthClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { AnalyticsData, AnalyticsRange, AnalyticsVisit } from "@/types/cms";
 import {
   aggregateByDay,
@@ -48,7 +48,7 @@ export async function fetchAnalyticsData(
   if (!isSupabaseConfigured()) return emptyAnalytics;
 
   try {
-    const supabase = await createClient();
+    const supabase = await createAuthClient();
     const { data, error } = await supabase
       .from("analytics_visits")
       .select(
@@ -107,7 +107,7 @@ export async function fetchVisitCountsForDashboard(): Promise<{
   if (!isSupabaseConfigured()) return empty;
 
   try {
-    const supabase = await createClient();
+    const supabase = await createAuthClient();
     const now = new Date();
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);

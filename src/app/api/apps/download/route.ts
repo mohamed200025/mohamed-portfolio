@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, offline: true });
     }
 
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { error } = await supabase.rpc("increment_app_downloads", { app_slug: slug.trim() });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

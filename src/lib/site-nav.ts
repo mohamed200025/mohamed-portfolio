@@ -14,7 +14,7 @@ export const siteNavLinks: SiteNavLink[] = [
   { label: "Apps", href: "/apps", hashHref: "/apps", activeKey: "apps" },
   { label: "Services", href: "/#services", hashHref: "#services" },
   { label: "Technologies", href: "/#technologies", hashHref: "#technologies" },
-  { label: "Calculator", href: "/#calculator", hashHref: "#calculator" },
+  { label: "Pricing", href: "/#pricing", hashHref: "#pricing" },
   { label: "Contact", href: "/#contact", hashHref: "#contact" },
 ];
 

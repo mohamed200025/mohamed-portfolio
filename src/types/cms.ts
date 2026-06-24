@@ -325,6 +325,46 @@ export interface PricingLead {
   created_at: string;
 }
 
+export type PricingProposalStatus =
+  | "pending"
+  | "reviewing"
+  | "approved"
+  | "rejected"
+  | "completed";
+
+export interface PricingProposal {
+  id: string;
+  proposal_id: string;
+  status: PricingProposalStatus;
+  client_full_name: string;
+  phone_number: string | null;
+  email: string | null;
+  company_name: string | null;
+  country: string | null;
+  project_name: string;
+  project_description: string;
+  category_id: string | null;
+  industry_id: string | null;
+  target_audience: string | null;
+  selected_services: { id: string; label: string; amount: number }[];
+  optional_features: { id: string; label: string; amount: number }[];
+  /** Page range label from the calculator, e.g. "1–5 Pages" — not a numeric count. */
+  number_of_pages: string | null;
+  complexity_level: string | null;
+  complexity_score: number;
+  timeline: string | null;
+  estimated_duration: string | null;
+  currency: string;
+  price_breakdown: { id: string; label: string; amount: number }[];
+  subtotal: number;
+  final_price: number;
+  pdf_storage_path: string | null;
+  pdf_public_url: string | null;
+  client_metadata: Record<string, unknown>;
+  read: boolean;
+  created_at: string;
+}
+
 export interface PortfolioData {
   hero: HeroSettings;
   featuredProject: ProjectRecord | null;

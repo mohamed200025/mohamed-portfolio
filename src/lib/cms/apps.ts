@@ -1,4 +1,5 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type { AppRecord } from "@/types/cms";
 import { defaultApps } from "./defaults";
 import { normalizeApp } from "./app-utils";
@@ -33,7 +34,7 @@ export async function fetchAllPublishedApps(): Promise<AppRecord[]> {
   if (!isSupabaseConfigured()) return defaultApps;
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const [appsRes, shotsRes] = await Promise.all([
       supabase
         .from("apps")
@@ -44,7 +45,9 @@ export async function fetchAllPublishedApps(): Promise<AppRecord[]> {
       supabase.from("app_screenshots").select("*").order("sort_order"),
     ]);
 
-    if (!appsRes.data?.length) return [];
+    if (appsRes.error || !appsRes.data?.length) {
+      return defaultApps;
+    }
 
     const shotsByApp = (shotsRes.data ?? []).reduce<Record<string, AppRecord["screenshots"]>>(
       (acc, img) => {

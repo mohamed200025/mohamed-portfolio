@@ -16,7 +16,7 @@ export function SitePageNav({ active }: SitePageNavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const links = siteNavLinks.filter((link) =>
-    ["Home", "About", "Projects", "Apps", "Services", "Contact"].includes(link.label)
+    ["Home", "About", "Projects", "Apps", "Services", "Pricing", "Contact"].includes(link.label)
   );
 
   return (

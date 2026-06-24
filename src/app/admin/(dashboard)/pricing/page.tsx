@@ -1,11 +1,14 @@
-import { PricingManager } from "@/components/admin/PricingManager";
+import { WizardPricingManager } from "@/components/admin/WizardPricingManager";
 
 export default function AdminPricingPage() {
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-bold text-white">Pricing Calculator</h1>
-      <p className="mb-6 text-sm text-white/50">Manage currencies, project types, features, and timeline multipliers. Base prices are in EUR.</p>
-      <PricingManager />
+      <h1 className="mb-2 text-2xl font-bold text-white">Pricing Settings</h1>
+      <p className="mb-6 text-sm text-white/50">
+        Manage exchange rates, service prices, optional features, timeline multipliers, and
+        complexity multipliers. Default currency is DZD.
+      </p>
+      <WizardPricingManager />
     </div>
   );
 }

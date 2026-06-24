@@ -8,14 +8,19 @@
     "start": "next start",
     "lint": "eslint",
     "migrate:pricing": "node scripts/apply-pricing-migration.mjs",
+    "migrate:pricing-proposals-drift": "node scripts/apply-pricing-proposals-drift-migration.mjs",
+    "migrate:pricing-proposals-pages-text": "node scripts/apply-pricing-proposals-pages-text.mjs",
+    "validate:pricing-proposals": "node scripts/validate-pricing-proposals-schema.mjs",
     "generate:favicons": "node scripts/generate-favicons.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
     "next": "16.2.9",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
@@ -23,6 +28,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
